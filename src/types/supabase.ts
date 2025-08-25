@@ -6,24 +6,24 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          email: string;
-          full_name: string | null;
+          user_id: string;
+          display_name: string | null;
           avatar_url: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
-          id: string;
-          email: string;
-          full_name?: string | null;
+          id?: string;
+          user_id: string;
+          display_name?: string | null;
           avatar_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
-          email?: string;
-          full_name?: string | null;
+          user_id?: string;
+          display_name?: string | null;
           avatar_url?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -33,10 +33,10 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          amount: number;
-          description: string;
-          category: string;
           type: 'income' | 'expense';
+          amount: number;
+          category: string;
+          description: string | null;
           date: string;
           created_at: string;
           updated_at: string;
@@ -44,21 +44,21 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          amount: number;
-          description: string;
-          category: string;
           type: 'income' | 'expense';
-          date: string;
+          amount: number;
+          category: string;
+          description?: string | null;
+          date?: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
           user_id?: string;
-          amount?: number;
-          description?: string;
-          category?: string;
           type?: 'income' | 'expense';
+          amount?: number;
+          category?: string;
+          description?: string | null;
           date?: string;
           created_at?: string;
           updated_at?: string;
@@ -68,30 +68,30 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          title: string;
-          target_amount: number;
-          current_amount: number;
-          deadline: string | null;
+          name: string;
+          target: number;
+          current: number;
+          type: 'emergency' | 'investment' | 'recovery' | 'custom';
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
           user_id: string;
-          title: string;
-          target_amount: number;
-          current_amount?: number;
-          deadline?: string | null;
+          name: string;
+          target: number;
+          current?: number;
+          type: 'emergency' | 'investment' | 'recovery' | 'custom';
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
           user_id?: string;
-          title?: string;
-          target_amount?: number;
-          current_amount?: number;
-          deadline?: string | null;
+          name?: string;
+          target?: number;
+          current?: number;
+          type?: 'emergency' | 'investment' | 'recovery' | 'custom';
           created_at?: string;
           updated_at?: string;
         };

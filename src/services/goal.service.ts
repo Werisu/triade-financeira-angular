@@ -23,7 +23,7 @@ export class GoalService {
         .from('goals')
         .select('*')
         .eq('user_id', userId)
-        .order('deadline', { ascending: true });
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
       this.goalsSubject.next(data || []);

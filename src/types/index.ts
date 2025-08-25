@@ -7,10 +7,10 @@ export interface User {
 export interface Transaction {
   id: string;
   user_id: string;
-  description: string;
-  amount: number;
   type: 'income' | 'expense';
+  amount: number;
   category: string;
+  description: string | null;
   date: string;
   created_at: string;
 }
@@ -18,10 +18,10 @@ export interface Transaction {
 export interface Goal {
   id: string;
   user_id: string;
-  title: string;
-  target_amount: number;
-  current_amount: number;
-  deadline: string;
+  name: string;
+  target: number;
+  current: number;
+  type: 'emergency' | 'investment' | 'recovery' | 'custom';
   created_at: string;
 }
 
