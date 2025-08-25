@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-auth',
@@ -61,24 +62,46 @@ import { Router } from '@angular/router';
                 [(ngModel)]="password"
                 name="password"
                 required
+                minlength="6"
                 class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="••••••••"
               />
             </div>
 
-            <div *ngIf="error" class="text-destructive text-sm text-center">
+            <div
+              *ngIf="error"
+              class="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-md"
+            >
               {{ error }}
+            </div>
+
+            <div
+              *ngIf="success"
+              class="text-green-600 text-sm text-center bg-green-100 p-3 rounded-md"
+            >
+              {{ success }}
             </div>
 
             <button
               type="submit"
-              [disabled]="loading"
+              [disabled]="loading || !email || !password || password.length < 6"
               class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
               <span *ngIf="loading" class="inline-block animate-spin mr-2">⟳</span>
               {{ mode === 'signin' ? 'Entrar' : 'Cadastrar' }}
             </button>
           </form>
+
+          <!-- Debug Info -->
+          <div class="mt-6 p-4 bg-muted rounded-md text-xs text-muted-foreground">
+            <p><strong>Debug:</strong></p>
+            <p>Email: {{ email }}</p>
+            <p>Password length: {{ password.length }}</p>
+            <p>Mode: {{ mode }}</p>
+            <p>Loading: {{ loading }}</p>
+            <p>Error: {{ error || 'none' }}</p>
+            <p>Success: {{ success || 'none' }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -87,16 +110,19 @@ import { Router } from '@angular/router';
 })
 export class AuthComponent {
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   mode: 'signin' | 'signup' = 'signin';
   email = '';
   password = '';
   loading = false;
   error = '';
+  success = '';
 
   setMode(mode: 'signin' | 'signup') {
     this.mode = mode;
     this.error = '';
+    this.success = '';
   }
 
   async onSubmit() {
@@ -105,13 +131,54 @@ export class AuthComponent {
       return;
     }
 
+    if (this.password.length < 6) {
+      this.error = 'A senha deve ter pelo menos 6 caracteres';
+      return;
+    }
+
     this.loading = true;
     this.error = '';
+    this.success = '';
 
-    // Simular autenticação por enquanto
-    setTimeout(() => {
+    try {
+      console.log(`Tentando ${this.mode} com:`, {
+        email: this.email,
+        passwordLength: this.password.length,
+      });
+
+      let result;
+
+      if (this.mode === 'signin') {
+        result = await this.authService.signIn(this.email, this.password);
+        console.log('Resultado do signIn:', result);
+      } else {
+        result = await this.authService.signUp(this.email, this.password);
+        console.log('Resultado do signUp:', result);
+      }
+
+      if (result.success) {
+        if (this.mode === 'signup') {
+          this.success = 'Conta criada com sucesso! Verifique seu email para confirmar.';
+          // Aguardar um pouco antes de redirecionar
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 2000);
+        } else {
+          this.success = 'Login realizado com sucesso!';
+          // Redirecionar imediatamente após login
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 1000);
+        }
+      } else {
+        this.error = result.error || 'Erro na autenticação';
+        console.error('Erro na autenticação:', result.error);
+      }
+    } catch (error: any) {
+      console.error('Exceção capturada:', error);
+      this.error = error.message || 'Erro inesperado';
+    } finally {
       this.loading = false;
-      this.router.navigate(['/']);
-    }, 1000);
+    }
   }
 }

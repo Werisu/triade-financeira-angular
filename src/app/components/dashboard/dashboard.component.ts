@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
+import { User } from '../../../types';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,7 +12,12 @@ import { Router } from '@angular/router';
     <div class="min-h-screen bg-background p-4 lg:p-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-foreground">Tríade Financeira</h1>
+        <div>
+          <h1 class="text-3xl font-bold text-foreground">Tríade Financeira</h1>
+          <p *ngIf="currentUser" class="text-muted-foreground mt-1">
+            Bem-vindo, {{ currentUser.email }}
+          </p>
+        </div>
         <button
           (click)="signOut()"
           class="flex items-center space-x-2 bg-destructive text-destructive-foreground px-4 py-2 rounded-md hover:bg-destructive/90 transition-colors"
@@ -124,15 +131,14 @@ import { Router } from '@angular/router';
             <div class="space-y-4">
               <div *ngFor="let goal of goals" class="p-4 bg-muted rounded-md">
                 <div class="flex justify-between items-start mb-2">
-                  <h3 class="font-medium text-foreground">{{ goal.title }}</h3>
-                  <span class="text-sm text-muted-foreground">{{ formatDate(goal.deadline) }}</span>
+                  <h3 class="font-medium text-foreground">{{ goal.name }}</h3>
+                  <span class="text-sm text-muted-foreground">{{ goal.type }}</span>
                 </div>
                 <div class="mb-2">
                   <div class="flex justify-between text-sm text-muted-foreground mb-1">
                     <span>Progresso</span>
                     <span
-                      >{{ formatCurrency(goal.current_amount) }} /
-                      {{ formatCurrency(goal.target_amount) }}</span
+                      >{{ formatCurrency(goal.current) }} / {{ formatCurrency(goal.target) }}</span
                     >
                   </div>
                   <div class="w-full bg-background rounded-full h-2">
@@ -170,8 +176,11 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
   private router = inject(Router);
+  private authService = inject(AuthService);
 
-  // Dados simulados
+  currentUser: User | null = null;
+
+  // Dados simulados (serão substituídos por dados reais)
   balance = 12500;
   monthlyIncome = 8500;
   monthlyExpenses = 3200;
@@ -207,33 +216,41 @@ export class DashboardComponent implements OnInit {
   goals = [
     {
       id: '1',
-      title: 'Viagem para Europa',
-      target_amount: 15000,
-      current_amount: 8500,
-      deadline: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      name: 'Viagem para Europa',
+      target: 15000,
+      current: 8500,
+      type: 'custom',
     },
     {
       id: '2',
-      title: 'Entrada do Apartamento',
-      target_amount: 50000,
-      current_amount: 25000,
-      deadline: new Date(Date.now() + 12 * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      name: 'Entrada do Apartamento',
+      target: 50000,
+      current: 25000,
+      type: 'investment',
     },
     {
       id: '3',
-      title: 'Fundo de Emergência',
-      target_amount: 10000,
-      current_amount: 10000,
-      deadline: new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      name: 'Fundo de Emergência',
+      target: 10000,
+      current: 10000,
+      type: 'emergency',
     },
   ];
 
   ngOnInit() {
-    // Carregar dados reais aqui
+    // Observar mudanças no usuário atual
+    this.authService.currentUser$.subscribe((user) => {
+      this.currentUser = user;
+    });
   }
 
-  signOut() {
-    this.router.navigate(['/auth']);
+  async signOut() {
+    try {
+      await this.authService.signOut();
+      this.router.navigate(['/auth']);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   }
 
   formatCurrency(amount: number): string {
@@ -248,6 +265,6 @@ export class DashboardComponent implements OnInit {
   }
 
   getGoalProgress(goal: any): number {
-    return Math.min((goal.current_amount / goal.target_amount) * 100, 100);
+    return Math.min((goal.current / goal.target) * 100, 100);
   }
 }
