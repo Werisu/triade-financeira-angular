@@ -42,7 +42,7 @@ export class TransactionService {
       const { data, error } = await this.supabaseService
         .getClient()
         .from('transactions')
-        .insert([transaction])
+        .insert(transaction as any)
         .select()
         .single();
 

@@ -29,3 +29,6 @@ export interface AuthState {
   user: User | null;
   loading: boolean;
 }
+
+// Exportar tipos do Supabase
+export * from './supabase';

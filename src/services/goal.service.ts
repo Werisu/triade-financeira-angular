@@ -42,7 +42,7 @@ export class GoalService {
       const { data, error } = await this.supabaseService
         .getClient()
         .from('goals')
-        .insert([goal])
+        .insert(goal as any)
         .select()
         .single();
 
@@ -65,7 +65,7 @@ export class GoalService {
       const { data, error } = await this.supabaseService
         .getClient()
         .from('goals')
-        .update(updates)
+        .update(updates as any)
         .eq('id', id)
         .select()
         .single();

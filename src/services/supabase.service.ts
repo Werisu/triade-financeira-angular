@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -8,8 +9,14 @@ export class SupabaseService {
   private supabase: SupabaseClient;
 
   constructor() {
-    // Configuração temporária - substitua pelas suas credenciais do Supabase
-    this.supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+    // Configuração do Supabase usando variáveis de ambiente
+    this.supabase = createClient(environment.supabase.url, environment.supabase.anonKey, {
+      auth: {
+        storage: localStorage,
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    });
   }
 
   getClient(): SupabaseClient {
@@ -46,5 +53,20 @@ export class SupabaseService {
 
   onAuthStateChange(callback: (event: string, session: any) => void) {
     return this.supabase.auth.onAuthStateChange(callback);
+  }
+
+  // Método para verificar se o usuário está autenticado
+  async isAuthenticated(): Promise<boolean> {
+    const user = await this.getCurrentUser();
+    return user !== null;
+  }
+
+  // Método para obter a sessão atual
+  async getSession() {
+    const {
+      data: { session },
+      error,
+    } = await this.supabase.auth.getSession();
+    return { session, error };
   }
 }

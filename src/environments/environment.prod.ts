@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   supabase: {
     url: 'https://mmpsnydvhbardmioqztf.supabase.co',
     anonKey:
