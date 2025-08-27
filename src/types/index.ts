@@ -15,6 +15,35 @@ export interface Transaction {
   created_at: string;
 }
 
+export interface CreditCard {
+  id: string;
+  user_id: string;
+  name: string;
+  limit: number;
+  closing_day: number;
+  due_day: number;
+  color: string;
+  created_at: string;
+}
+
+export interface CreditCardExpense {
+  id: string;
+  user_id: string;
+  credit_card_id: string;
+  description: string;
+  amount: number;
+  category: string;
+  tags: string[];
+  installment_number?: number;
+  total_installments?: number;
+  date: string;
+  created_at: string;
+  credit_cards?: {
+    name: string;
+    color: string;
+  };
+}
+
 export interface Goal {
   id: string;
   user_id: string;

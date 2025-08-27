@@ -20,12 +20,34 @@
   }
 }
 
+/* Estilos específicos para o dashboard */
 .animate-fade-in {
-  animation: fade-in 0.6s ease-out;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-pulse-gentle {
-  animation: pulse-gentle 3s ease-in-out infinite;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* Sombras personalizadas */
@@ -34,7 +56,7 @@
 }
 
 .shadow-large {
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .shadow-glow {

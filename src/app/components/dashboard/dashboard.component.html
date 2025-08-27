@@ -168,6 +168,68 @@
         </div>
       </div>
 
+      <!-- Credit Cards Section -->
+      <div class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-foreground">Cartões de Crédito</h2>
+          <div class="flex space-x-3">
+            <button
+              (click)="showCreditCardForm = true"
+              class="group bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                <span>Novo Cartão</span>
+              </div>
+            </button>
+            <button
+              (click)="showCreditCardExpenseForm = true"
+              class="group bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                <span>Novo Gasto</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Credit Cards List -->
+        <app-credit-cards-manager *ngIf="!showCreditCardForm"></app-credit-cards-manager>
+
+        <!-- Credit Card Form -->
+        <app-credit-card-form
+          *ngIf="showCreditCardForm"
+          (creditCardCreated)="onCreditCardCreated($event)"
+        ></app-credit-card-form>
+
+        <!-- Credit Card Expense Form -->
+        <app-credit-card-expense-form
+          *ngIf="showCreditCardExpenseForm"
+          (expenseCreated)="onCreditCardExpenseCreated($event)"
+        ></app-credit-card-expense-form>
+      </div>
+
+      <!-- Credit Card Expenses List -->
+      <div class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6">
+        <h2 class="text-2xl font-bold text-foreground mb-6">Gastos com Cartão de Crédito</h2>
+        <app-credit-card-expenses-list></app-credit-card-expenses-list>
+      </div>
+
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Transactions Section -->

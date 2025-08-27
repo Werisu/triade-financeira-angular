@@ -18,16 +18,25 @@ export class AuthService {
   }
 
   private async initializeAuth() {
-    const user = await this.supabaseService.getCurrentUser();
-    if (user) {
-      this.currentUserSubject.next({
-        id: user.id,
-        email: user.email || '',
-        created_at: user.created_at,
-      });
-    }
-    this.loadingSubject.next(false);
+    try {
+      // Primeiro verifica se há uma sessão ativa
+      const { session } = await this.supabaseService.getSession();
 
+      if (session?.user) {
+        // Se há sessão, define o usuário imediatamente
+        this.currentUserSubject.next({
+          id: session.user.id,
+          email: session.user.email || '',
+          created_at: session.user.created_at,
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao verificar sessão:', error);
+    } finally {
+      this.loadingSubject.next(false);
+    }
+
+    // Configura o listener para mudanças de estado
     this.supabaseService.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         this.currentUserSubject.next({
@@ -35,7 +44,7 @@ export class AuthService {
           email: session.user.email || '',
           created_at: session.user.created_at,
         });
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
         this.currentUserSubject.next(null);
       }
     });
@@ -67,5 +76,10 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  // Método para verificar se está autenticado
+  isAuthenticated(): boolean {
+    return this.currentUserSubject.value !== null;
   }
 }
