@@ -5,425 +5,28 @@ import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { GoalService } from '../../../services/goal.service';
 import { TransactionService } from '../../../services/transaction.service';
-import { Goal, Transaction, User } from '../../../types';
+import { CreditCard, CreditCardExpense, Goal, Transaction, User } from '../../../types';
+import { CreditCardExpenseFormComponent } from '../credit-card-expense-form/credit-card-expense-form.component';
+import { CreditCardExpensesListComponent } from '../credit-card-expenses-list/credit-card-expenses-list.component';
+import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.component';
+import { CreditCardsManagerComponent } from '../credit-cards-manager/credit-cards-manager.component';
 import { GoalFormComponent } from '../goal-form/goal-form.component';
 import { TransactionFormComponent } from '../transaction-form/transaction-form.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TransactionFormComponent, GoalFormComponent],
-  template: `
-    <div
-      class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden"
-    >
-      <!-- Background Elements -->
-      <div class="absolute inset-0 overflow-hidden">
-        <div
-          class="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-br from-primary-200/30 to-transparent rounded-full blur-3xl"
-        ></div>
-        <div
-          class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-tr from-secondary-200/30 to-transparent rounded-full blur-3xl"
-        ></div>
-        <div
-          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-success-200/20 to-warning-200/20 rounded-full blur-3xl animate-pulse-gentle"
-        ></div>
-      </div>
-
-      <!-- Main Content -->
-      <div class="relative z-10 min-h-screen p-4 lg:p-8">
-        <!-- Header -->
-        <div
-          class="backdrop-blur-xl bg-white/70 rounded-3xl shadow-large border border-white/20 p-6 mb-8"
-        >
-          <div
-            class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0"
-          >
-            <div class="flex items-center space-x-4">
-              <div
-                class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-glow flex items-center justify-center"
-              >
-                <span class="text-2xl">💰</span>
-              </div>
-              <div>
-                <h1
-                  class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent"
-                >
-                  FinWell
-                </h1>
-                <p *ngIf="currentUser" class="text-muted-foreground mt-1 font-medium">
-                  Bem-vindo, {{ currentUser.email }}
-                </p>
-              </div>
-            </div>
-            <button
-              (click)="signOut()"
-              class="group relative inline-flex items-center space-x-3 bg-gradient-to-r from-danger-500 to-danger-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              <span>Sair</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Loading State -->
-        <div *ngIf="loading" class="flex justify-center items-center py-20">
-          <div class="relative">
-            <div class="w-16 h-16 border-4 border-primary-200 rounded-full animate-spin"></div>
-            <div
-              class="absolute top-0 left-0 w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"
-            ></div>
-          </div>
-        </div>
-
-        <!-- Dashboard Content -->
-        <div *ngIf="!loading" class="space-y-8 animate-fade-in">
-          <!-- Financial Overview Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Saldo Total -->
-            <div
-              class="group backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 p-6 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
-            >
-              <div class="flex items-center space-x-4">
-                <div
-                  class="w-14 h-14 bg-gradient-to-br from-success-400 to-success-500 rounded-2xl shadow-glow flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                >
-                  <span class="text-2xl">💰</span>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-muted-foreground">Saldo Total</p>
-                  <p class="text-2xl font-bold text-foreground">{{ formatCurrency(balance) }}</p>
-                </div>
-              </div>
-              <div class="mt-4 h-1 bg-success-100 rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-success-400 to-success-500 rounded-full transition-all duration-500"
-                  [style.width.%]="getBalanceProgress()"
-                ></div>
-              </div>
-            </div>
-
-            <!-- Receitas do Mês -->
-            <div
-              class="group backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 p-6 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
-            >
-              <div class="flex items-center space-x-4">
-                <div
-                  class="w-14 h-14 bg-gradient-to-br from-primary-400 to-primary-500 rounded-2xl shadow-glow flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                >
-                  <span class="text-2xl">📈</span>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-muted-foreground">Receitas do Mês</p>
-                  <p class="text-2xl font-bold text-success-600">
-                    {{ formatCurrency(monthlyIncome) }}
-                  </p>
-                </div>
-              </div>
-              <div class="mt-4 h-1 bg-primary-100 rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-primary-400 to-primary-500 rounded-full transition-all duration-500"
-                  [style.width.%]="getIncomeProgress()"
-                ></div>
-              </div>
-            </div>
-
-            <!-- Despesas do Mês -->
-            <div
-              class="group backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 p-6 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
-            >
-              <div class="flex items-center space-x-4">
-                <div
-                  class="w-14 h-14 bg-gradient-to-br from-danger-400 to-danger-500 rounded-2xl shadow-glow flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                >
-                  <span class="text-2xl">📉</span>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-muted-foreground">Despesas do Mês</p>
-                  <p class="text-2xl font-bold text-danger-600">
-                    {{ formatCurrency(monthlyExpenses) }}
-                  </p>
-                </div>
-              </div>
-              <div class="mt-4 h-1 bg-danger-100 rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-danger-400 to-danger-500 rounded-full transition-all duration-500"
-                  [style.width.%]="getExpensesProgress()"
-                ></div>
-              </div>
-            </div>
-
-            <!-- Metas Ativas -->
-            <div
-              class="group backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 p-6 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
-            >
-              <div class="flex items-center space-x-4">
-                <div
-                  class="w-14 h-14 bg-gradient-to-br from-warning-400 to-warning-500 rounded-2xl shadow-glow flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                >
-                  <span class="text-2xl">🎯</span>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-muted-foreground">Metas Ativas</p>
-                  <p class="text-2xl font-bold text-warning-600">{{ activeGoals }}</p>
-                </div>
-              </div>
-              <div class="mt-4 h-1 bg-warning-100 rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-warning-400 to-warning-500 rounded-full transition-all duration-500"
-                  [style.width.%]="getGoalsProgress()"
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Main Content Grid -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Transactions Section -->
-            <div class="lg:col-span-2 space-y-6">
-              <!-- Transactions Card -->
-              <div
-                class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6"
-              >
-                <div class="flex justify-between items-center mb-6">
-                  <h2 class="text-2xl font-bold text-foreground">Transações Recentes</h2>
-                  <button
-                    (click)="showTransactionForm = true"
-                    class="group bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
-                  >
-                    <div class="flex items-center space-x-2">
-                      <svg
-                        class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      <span>Nova Transação</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div *ngIf="transactions.length === 0" class="text-center py-12">
-                  <div
-                    class="w-24 h-24 mx-auto mb-4 bg-muted/50 rounded-full flex items-center justify-center"
-                  >
-                    <span class="text-4xl">📊</span>
-                  </div>
-                  <p class="text-lg font-medium text-muted-foreground">
-                    Nenhuma transação encontrada
-                  </p>
-                  <p class="text-sm text-muted-foreground mt-2">
-                    Comece adicionando sua primeira transação
-                  </p>
-                </div>
-
-                <div *ngIf="transactions.length > 0" class="space-y-3">
-                  <div
-                    *ngFor="let transaction of transactions; trackBy: trackByTransaction"
-                    class="group backdrop-blur-sm bg-white/60 rounded-2xl p-4 border border-white/30 hover:bg-white/80 hover:shadow-soft transition-all duration-300 transform hover:scale-[1.02]"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center space-x-4">
-                        <div
-                          class="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                          [class]="
-                            transaction.type === 'income'
-                              ? 'bg-success-100 text-success-600'
-                              : 'bg-danger-100 text-danger-600'
-                          "
-                        >
-                          <span class="text-xl">{{
-                            transaction.type === 'income' ? '💰' : '💸'
-                          }}</span>
-                        </div>
-                        <div>
-                          <p class="font-semibold text-foreground">{{ transaction.description }}</p>
-                          <p class="text-sm text-muted-foreground">{{ transaction.category }}</p>
-                        </div>
-                      </div>
-                      <div class="text-right">
-                        <p
-                          [class]="
-                            transaction.type === 'income' ? 'text-success-600' : 'text-danger-600'
-                          "
-                          class="font-bold text-lg"
-                        >
-                          {{ transaction.type === 'income' ? '+' : '-'
-                          }}{{ formatCurrency(transaction.amount) }}
-                        </p>
-                        <p class="text-sm text-muted-foreground">
-                          {{ formatDate(transaction.date) }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Financial Chart Placeholder -->
-              <div
-                class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6"
-              >
-                <h2 class="text-2xl font-bold text-foreground mb-6">Análise Financeira</h2>
-                <div
-                  class="h-80 bg-gradient-to-br from-muted/30 to-muted/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-muted-foreground/30"
-                >
-                  <div class="text-center">
-                    <div
-                      class="w-20 h-20 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center"
-                    >
-                      <span class="text-3xl">📈</span>
-                    </div>
-                    <p class="text-lg font-medium text-muted-foreground">
-                      Gráficos em desenvolvimento
-                    </p>
-                    <p class="text-sm text-muted-foreground">Visualizações avançadas em breve</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Goals Section -->
-            <div class="space-y-6">
-              <!-- Goals Card -->
-              <div
-                class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6"
-              >
-                <div class="flex justify-between items-center mb-6">
-                  <h2 class="text-2xl font-bold text-foreground">Metas Financeiras</h2>
-                  <button
-                    (click)="showGoalForm = true"
-                    class="group bg-gradient-to-r from-secondary-500 to-secondary-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
-                  >
-                    <div class="flex items-center space-x-2">
-                      <svg
-                        class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      <span>Nova Meta</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div *ngIf="goals.length === 0" class="text-center py-8">
-                  <div
-                    class="w-20 h-20 mx-auto mb-4 bg-muted/50 rounded-full flex items-center justify-center"
-                  >
-                    <span class="text-3xl">🎯</span>
-                  </div>
-                  <p class="text-lg font-medium text-muted-foreground">Nenhuma meta encontrada</p>
-                  <p class="text-sm text-muted-foreground mt-2">
-                    Comece criando sua primeira meta financeira
-                  </p>
-                </div>
-
-                <div *ngIf="goals.length > 0" class="space-y-4">
-                  <div
-                    *ngFor="let goal of goals; trackBy: trackByGoal"
-                    class="group backdrop-blur-sm bg-white/60 rounded-2xl p-4 border border-white/30 hover:bg-white/80 hover:shadow-soft transition-all duration-300 transform hover:scale-[1.02]"
-                  >
-                    <div class="flex justify-between items-start mb-3">
-                      <h3 class="font-semibold text-foreground">{{ goal.name }}</h3>
-                      <span
-                        class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium"
-                      >
-                        {{ goal.type }}
-                      </span>
-                    </div>
-                    <div class="mb-3">
-                      <div class="flex justify-between text-sm text-muted-foreground mb-2">
-                        <span>Progresso</span>
-                        <span class="font-medium"
-                          >{{ formatCurrency(goal.current) }} /
-                          {{ formatCurrency(goal.target) }}</span
-                        >
-                      </div>
-                      <div class="w-full bg-muted/50 rounded-full h-3 overflow-hidden">
-                        <div
-                          class="h-full bg-gradient-to-r from-primary-400 to-primary-500 rounded-full transition-all duration-1000 ease-out"
-                          [style.width.%]="getGoalProgress(goal)"
-                        ></div>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <span class="text-sm font-medium text-primary-600"
-                        >{{ getGoalProgress(goal).toFixed(1) }}%</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Quick Stats -->
-              <div
-                class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6"
-              >
-                <h2 class="text-2xl font-bold text-foreground mb-6">Estatísticas Rápidas</h2>
-                <div class="space-y-4">
-                  <div class="flex justify-between items-center p-3 bg-muted/30 rounded-xl">
-                    <span class="text-muted-foreground">Total de Transações</span>
-                    <span class="font-bold text-2xl text-primary-600">{{
-                      transactions.length
-                    }}</span>
-                  </div>
-                  <div class="flex justify-between items-center p-3 bg-muted/30 rounded-xl">
-                    <span class="text-muted-foreground">Metas Completadas</span>
-                    <span class="font-bold text-2xl text-success-600">{{ completedGoals }}</span>
-                  </div>
-                  <div class="flex justify-between items-center p-3 bg-muted/30 rounded-xl">
-                    <span class="text-muted-foreground">Média Mensal</span>
-                    <span class="font-bold text-2xl text-warning-600">{{
-                      formatCurrency(averageMonthly)
-                    }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Transaction Form Modal -->
-        <app-transaction-form
-          *ngIf="showTransactionForm"
-          [userId]="currentUser?.id || ''"
-          (close)="showTransactionForm = false"
-          (saved)="onTransactionSaved($event)"
-        />
-
-        <!-- Goal Form Modal -->
-        <app-goal-form
-          *ngIf="showGoalForm"
-          [userId]="currentUser?.id || ''"
-          (close)="showGoalForm = false"
-          (saved)="onGoalSaved($event)"
-        />
-      </div>
-    </div>
-  `,
-  styles: [],
+  imports: [
+    CommonModule,
+    TransactionFormComponent,
+    GoalFormComponent,
+    CreditCardFormComponent,
+    CreditCardExpenseFormComponent,
+    CreditCardsManagerComponent,
+    CreditCardExpensesListComponent,
+  ],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private router = inject(Router);
@@ -451,6 +54,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Estado dos modais
   showTransactionForm = false;
   showGoalForm = false;
+  showCreditCardForm = false;
+  showCreditCardExpenseForm = false;
 
   ngOnInit() {
     this.initializeDashboard();
@@ -581,6 +186,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onGoalSaved(goal: Goal) {
     // A meta já foi salva pelo serviço, apenas fechar o modal
     this.showGoalForm = false;
+  }
+
+  onCreditCardCreated(creditCard: CreditCard) {
+    // O cartão foi criado, fechar o modal
+    this.showCreditCardForm = false;
+  }
+
+  onCreditCardExpenseCreated(expense: CreditCardExpense) {
+    // O gasto foi criado, fechar o modal
+    this.showCreditCardExpenseForm = false;
   }
 
   formatCurrency(amount: number): string {

@@ -15,5 +15,21 @@ export const routes: Routes = [
     component: AuthComponent,
     canActivate: [NoAuthGuard],
   },
+  {
+    path: 'credit-cards',
+    loadComponent: () =>
+      import('./components/credit-cards-manager/credit-cards-manager.component').then(
+        (m) => m.CreditCardsManagerComponent
+      ),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'credit-card-expenses',
+    loadComponent: () =>
+      import('./components/credit-card-expense-form/credit-card-expense-form.component').then(
+        (m) => m.CreditCardExpenseFormComponent
+      ),
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

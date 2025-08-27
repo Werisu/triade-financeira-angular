@@ -15,6 +15,8 @@ export class SupabaseService {
         storage: localStorage,
         persistSession: true,
         autoRefreshToken: true,
+        detectSessionInUrl: true, // Detecta tokens na URL
+        flowType: 'pkce', // Usa PKCE para melhor segurança
       },
     });
   }
@@ -68,5 +70,11 @@ export class SupabaseService {
       error,
     } = await this.supabase.auth.getSession();
     return { session, error };
+  }
+
+  // Método para verificar se há uma sessão válida
+  async hasValidSession(): Promise<boolean> {
+    const { session } = await this.getSession();
+    return session !== null && session.user !== null;
   }
 }

@@ -1,0 +1,60 @@
+/* Estilos específicos para a lista de gastos com cartão de crédito */
+.expenses-list {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expense-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.expense-item:hover {
+  border-left-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.credit-card-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  color: white;
+  font-weight: 500;
+}
+
+.payment-method {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.installment-text {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.tags-display {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.total-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  margin-top: 1.5rem;
+}
+
+.total-amount {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
