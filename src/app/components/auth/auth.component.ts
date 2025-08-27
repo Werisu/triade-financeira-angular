@@ -39,7 +39,7 @@ import { AuthService } from '../../../services/auth.service';
             <h1
               class="text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent"
             >
-              Tríade Financeira
+              FinWell
             </h1>
             <p class="text-lg text-muted-foreground font-medium">
               Controle suas finanças pessoais com inteligência
@@ -211,7 +211,7 @@ import { AuthService } from '../../../services/auth.service';
 
           <!-- Footer -->
           <div class="text-center text-sm text-muted-foreground">
-            <p>© 2025 Tríade Financeira. Todos os direitos reservados.</p>
+            <p>© 2025 FinWell. Todos os direitos reservados.</p>
           </div>
         </div>
       </div>

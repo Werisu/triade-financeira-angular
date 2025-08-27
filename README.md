@@ -1,4 +1,4 @@
-# Tríade Financeira - Aplicação Angular Moderna
+# FinWell - Aplicação Angular Moderna
 
 Uma aplicação financeira pessoal construída com Angular 17 e design moderno de 2025, oferecendo controle completo sobre suas finanças com uma interface elegante e intuitiva.
 
@@ -203,4 +203,4 @@ Contribuições são bem-vindas! Por favor, leia o guia de contribuição antes 
 
 ---
 
-**Tríade Financeira** - Transformando o controle financeiro em uma experiência visual excepcional ✨
+**FinWell** - Transformando o controle financeiro em uma experiência visual excepcional ✨

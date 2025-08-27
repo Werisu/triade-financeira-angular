@@ -49,7 +49,7 @@ import { TransactionFormComponent } from '../transaction-form/transaction-form.c
                 <h1
                   class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent"
                 >
-                  Tríade Financeira
+                  FinWell
                 </h1>
                 <p *ngIf="currentUser" class="text-muted-foreground mt-1 font-medium">
                   Bem-vindo, {{ currentUser.email }}

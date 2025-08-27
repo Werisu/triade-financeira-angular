@@ -2,7 +2,7 @@
 
 ## 📋 Resumo da Conversão
 
-Este documento descreve o processo de conversão do projeto **Tríade Financeira** do React para Angular v20.
+Este documento descreve o processo de conversão do projeto **FinWell** do React para Angular v20.
 
 ## 🔄 O que foi convertido
 

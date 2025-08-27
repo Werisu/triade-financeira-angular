@@ -1,4 +1,4 @@
-# 📊 Dashboard com Dados Reais - Tríade Financeira
+# 📊 Dashboard com Dados Reais - FinWell
 
 ## ✅ **Implementação Concluída**
 
