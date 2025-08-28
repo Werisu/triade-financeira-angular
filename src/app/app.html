@@ -1,1 +1,13 @@
-<router-outlet />
+<div *ngIf="authService.loading$ | async" class="loading-screen">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Carregando...</p>
+  </div>
+</div>
+
+<div *ngIf="!(authService.loading$ | async)">
+  <app-header></app-header>
+  <main class="min-h-screen bg-gray-50">
+    <router-outlet />
+  </main>
+</div>
