@@ -49,11 +49,11 @@ export class CreditCardsManagerComponent implements OnInit {
     }
   }
 
-  formatLimit(limit: number): string {
+  formatLimit(credit_limit: number): string {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(limit);
+    }).format(credit_limit);
   }
 
   getDaysUntilClosing(creditCard: CreditCard): number {

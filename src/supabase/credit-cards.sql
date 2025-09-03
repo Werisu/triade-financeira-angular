@@ -9,7 +9,7 @@ IF NOT EXISTS credit_cards
 DELETE CASCADE,
   name TEXT
 NOT NULL,
-  limit DECIMAL
+  credit_limit DECIMAL
 (10,2) NOT NULL,
   closing_day INTEGER NOT NULL CHECK
 (closing_day >= 1 AND closing_day <= 31),

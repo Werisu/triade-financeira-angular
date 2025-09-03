@@ -17,7 +17,7 @@ export class CreditCardFormComponent {
 
   creditCard: Partial<CreditCard> = {
     name: '',
-    limit: 0,
+    credit_limit: 0,
     closing_day: 1,
     due_day: 1,
     color: '#3B82F6',
@@ -30,7 +30,7 @@ export class CreditCardFormComponent {
   constructor(private creditCardService: CreditCardService, private authService: AuthService) {}
 
   async onSubmit() {
-    if (!this.creditCard.name || !this.creditCard.limit) {
+    if (!this.creditCard.name || !this.creditCard.credit_limit) {
       return;
     }
 
@@ -58,7 +58,7 @@ export class CreditCardFormComponent {
   resetForm() {
     this.creditCard = {
       name: '',
-      limit: 0,
+      credit_limit: 0,
       closing_day: 1,
       due_day: 1,
       color: '#3B82F6',
