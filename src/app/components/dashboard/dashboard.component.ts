@@ -8,6 +8,7 @@ import { TransactionService } from '../../../services/transaction.service';
 import { CreditCard, CreditCardExpense, Goal, Transaction, User } from '../../../types';
 import { CreditCardExpenseFormComponent } from '../credit-card-expense-form/credit-card-expense-form.component';
 import { CreditCardExpensesListComponent } from '../credit-card-expenses-list/credit-card-expenses-list.component';
+import { CreditCardExpensesManagerComponent } from '../credit-card-expenses-manager/credit-card-expenses-manager.component';
 import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.component';
 import { CreditCardsManagerComponent } from '../credit-cards-manager/credit-cards-manager.component';
 import { GoalFormComponent } from '../goal-form/goal-form.component';
@@ -26,6 +27,7 @@ import { TransactionsManagerComponent } from '../transactions-manager/transactio
     CreditCardExpenseFormComponent,
     CreditCardsManagerComponent,
     CreditCardExpensesListComponent,
+    CreditCardExpensesManagerComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -59,6 +61,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showGoalForm = false;
   showCreditCardForm = false;
   showCreditCardExpenseForm = false;
+  showCreditCardExpensesManager = false;
 
   ngOnInit() {
     this.initializeDashboard();
@@ -203,6 +206,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onCreditCardExpenseCreated(expense: CreditCardExpense) {
     // O gasto foi criado, fechar o modal
     this.showCreditCardExpenseForm = false;
+  }
+
+  onCreditCardExpensesManagerClosed() {
+    this.showCreditCardExpensesManager = false;
   }
 
   formatCurrency(amount: number): string {

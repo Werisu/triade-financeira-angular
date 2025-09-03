@@ -1,0 +1,112 @@
+/* Estilos específicos para o componente de importação de despesas */
+
+.import-container {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.file-upload-area {
+  transition: all 0.2s ease-in-out;
+}
+
+.file-upload-area:hover {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.file-upload-area.dragover {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+}
+
+.import-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.import-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.preview-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.preview-table th {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.preview-table td {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.preview-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Animações de loading */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .preview-table {
+    font-size: 0.875rem;
+  }
+
+  .preview-table th,
+  .preview-table td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Estados de sucesso e erro */
+.success-state {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #22c55e;
+}
+
+.error-state {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-color: #ef4444;
+}
+
+.warning-state {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #f59e0b;
+}

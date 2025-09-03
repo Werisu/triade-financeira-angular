@@ -50,6 +50,7 @@
     "@nx/workspace": "21.4.1",
     "@schematics/angular": "^20.2.0",
     "@types/jasmine": "~5.1.0",
+    "@types/xlsx": "^0.0.35",
     "autoprefixer": "^10.4.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
