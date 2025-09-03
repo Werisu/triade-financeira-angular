@@ -1,0 +1,9 @@
+/* Estilos para a página de cartões de crédito */
+.credit-card-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.credit-card-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}

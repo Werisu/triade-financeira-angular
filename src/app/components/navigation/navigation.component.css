@@ -1,0 +1,14 @@
+/* Estilos para o componente de navegação */
+.navigation-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.navigation-item:hover {
+  transform: translateX(4px);
+}
+
+.navigation-item.active {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border-left: 4px solid #3b82f6;
+}
