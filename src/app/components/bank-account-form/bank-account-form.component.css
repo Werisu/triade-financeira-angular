@@ -1,0 +1,39 @@
+/* Estilos específicos para o formulário de conta bancária */
+.bank-account-form {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.color-picker button {
+  transition: all 0.2s ease-in-out;
+}
+
+.color-picker button:hover {
+  transform: scale(1.1);
+}
+
+.color-picker button.ring-2 {
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.5);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

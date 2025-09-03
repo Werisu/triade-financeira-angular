@@ -3,10 +3,20 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { BankAccountService } from '../../../services/bank-account.service';
 import { CreditCardExpenseService } from '../../../services/credit-card-expense.service';
 import { GoalService } from '../../../services/goal.service';
 import { TransactionService } from '../../../services/transaction.service';
-import { CreditCard, CreditCardExpense, Goal, Transaction, User } from '../../../types';
+import {
+  BankAccount,
+  CreditCard,
+  CreditCardExpense,
+  Goal,
+  Transaction,
+  User,
+} from '../../../types';
+import { BankAccountFormComponent } from '../bank-account-form/bank-account-form.component';
+import { BankAccountsManagerComponent } from '../bank-accounts-manager/bank-accounts-manager.component';
 import { CreditCardExpenseFormComponent } from '../credit-card-expense-form/credit-card-expense-form.component';
 import { CreditCardExpensesListComponent } from '../credit-card-expenses-list/credit-card-expenses-list.component';
 import { CreditCardExpensesManagerComponent } from '../credit-card-expenses-manager/credit-card-expenses-manager.component';
@@ -24,6 +34,8 @@ import { TransactionsManagerComponent } from '../transactions-manager/transactio
     TransactionFormComponent,
     TransactionsManagerComponent,
     GoalFormComponent,
+    BankAccountFormComponent,
+    BankAccountsManagerComponent,
     CreditCardFormComponent,
     CreditCardExpenseFormComponent,
     CreditCardsManagerComponent,
@@ -39,6 +51,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private transactionService = inject(TransactionService);
   private goalService = inject(GoalService);
   private creditCardExpenseService = inject(CreditCardExpenseService);
+  private bankAccountService = inject(BankAccountService);
 
   private destroy$ = new Subject<void>();
 
@@ -49,6 +62,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   transactions: Transaction[] = [];
   goals: Goal[] = [];
   creditCardExpenses: CreditCardExpense[] = [];
+  bankAccounts: BankAccount[] = [];
 
   // Dados calculados
   balance = 0;
@@ -62,6 +76,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showTransactionForm = false;
   showTransactionsManager = false;
   showGoalForm = false;
+  showBankAccountForm = false;
+  showBankAccountsManager = false;
   showCreditCardForm = false;
   showCreditCardExpenseForm = false;
   showCreditCardExpensesManager = false;
@@ -93,11 +109,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private async loadUserData(userId: string) {
     try {
-      // Carregar transações, metas e gastos dos cartões em paralelo
+      // Carregar transações, metas, gastos dos cartões e contas bancárias em paralelo
       await Promise.all([
         this.loadTransactions(userId),
         this.loadGoals(userId),
         this.loadCreditCardExpenses(userId),
+        this.loadBankAccounts(userId),
       ]);
 
       // Calcular estatísticas
@@ -142,6 +159,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  private async loadBankAccounts(userId: string) {
+    try {
+      this.bankAccounts = await this.bankAccountService.getBankAccounts();
+      this.calculateStats();
+    } catch (error) {
+      console.error('Erro ao carregar contas bancárias:', error);
+    }
+  }
+
   private calculateStats() {
     // Calcular receitas e despesas totais (todos os meses)
     this.monthlyIncome = this.transactions
@@ -159,11 +185,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       0
     );
 
+    // Calcular saldo total das contas bancárias
+    const bankAccountBalance = this.bankAccounts.reduce(
+      (sum, account) => sum + account.current_balance,
+      0
+    );
+
     // Total de despesas (transações + cartões)
     this.monthlyExpenses = transactionExpenses + creditCardExpenses;
 
-    // Calcular saldo total
-    this.balance = this.monthlyIncome - this.monthlyExpenses;
+    // Calcular saldo total (receitas - despesas + saldo das contas)
+    this.balance = this.monthlyIncome - this.monthlyExpenses + bankAccountBalance;
 
     // Calcular estatísticas das metas
     this.activeGoals = this.goals.length;
@@ -188,7 +220,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       const recentCreditExpenses = recentCreditCardExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-      const totalRecent = recentIncome - (recentTransactionExpenses + recentCreditExpenses);
+      // Incluir saldo das contas bancárias na média mensal
+      const totalRecent =
+        recentIncome - (recentTransactionExpenses + recentCreditExpenses) + bankAccountBalance;
       this.averageMonthly = totalRecent / 3;
     }
   }
@@ -231,6 +265,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   onCreditCardExpensesManagerClosed() {
     this.showCreditCardExpensesManager = false;
+  }
+
+  onBankAccountCreated(bankAccount: BankAccount) {
+    // A conta foi criada, fechar o modal e recarregar dados
+    this.showBankAccountForm = false;
+    if (this.currentUser) {
+      this.loadBankAccounts(this.currentUser.id);
+    }
+  }
+
+  onBankAccountsManagerClosed() {
+    this.showBankAccountsManager = false;
   }
 
   formatCurrency(amount: number): string {

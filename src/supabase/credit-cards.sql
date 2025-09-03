@@ -1,141 +1,121 @@
--- Criar tabela de cartões de crédito
-CREATE TABLE
-IF NOT EXISTS credit_cards
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.credit_card_expenses
 (
-  id UUID DEFAULT gen_random_uuid
-() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users
-(id) ON
-DELETE CASCADE,
-  name TEXT
-NOT NULL,
-  credit_limit DECIMAL
-(10,2) NOT NULL,
-  closing_day INTEGER NOT NULL CHECK
-(closing_day >= 1 AND closing_day <= 31),
-  due_day INTEGER NOT NULL CHECK
-(due_day >= 1 AND due_day <= 31),
-  color TEXT NOT NULL DEFAULT '#3B82F6',
-  created_at TIMESTAMP
-WITH TIME ZONE DEFAULT NOW
-(),
-  updated_at TIMESTAMP
-WITH TIME ZONE DEFAULT NOW
-()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  credit_card_id uuid NOT NULL,
+  description text NOT NULL,
+  amount numeric NOT NULL,
+  category text NOT NULL,
+  tags ARRAY DEFAULT '{}'
+  ::text[],
+  installment_number integer CHECK
+  (installment_number >= 1),
+  total_installments integer CHECK
+  (total_installments >= 1),
+  date date NOT NULL,
+  created_at timestamp
+  with time zone DEFAULT now
+  (),
+  updated_at timestamp
+  with time zone DEFAULT now
+  (),
+  CONSTRAINT credit_card_expenses_pkey PRIMARY KEY
+  (id),
+  CONSTRAINT credit_card_expenses_user_id_fkey FOREIGN KEY
+  (user_id) REFERENCES auth.users
+  (id),
+  CONSTRAINT credit_card_expenses_credit_card_id_fkey FOREIGN KEY
+  (credit_card_id) REFERENCES public.credit_cards
+  (id)
 );
-
--- Criar tabela de gastos com cartão de crédito
-CREATE TABLE
-IF NOT EXISTS credit_card_expenses
-(
-  id UUID DEFAULT gen_random_uuid
-() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users
-(id) ON
-DELETE CASCADE,
-  credit_card_id UUID
-NOT NULL REFERENCES credit_cards
-(id) ON
-DELETE CASCADE,
-  description TEXT
-NOT NULL,
-  amount DECIMAL
-(10,2) NOT NULL,
-  category TEXT NOT NULL,
-  tags TEXT[] DEFAULT '{}',
-  installment_number INTEGER CHECK
-(installment_number >= 1),
-  total_installments INTEGER CHECK
-(total_installments >= 1),
-  date DATE NOT NULL,
-  created_at TIMESTAMP
-WITH TIME ZONE DEFAULT NOW
-(),
-  updated_at TIMESTAMP
-WITH TIME ZONE DEFAULT NOW
-()
+  CREATE TABLE public.credit_cards
+  (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL,
+    name text NOT NULL,
+    credit_limit numeric NOT NULL,
+    closing_day integer NOT NULL CHECK (closing_day >= 1 AND closing_day <= 31),
+    due_day integer NOT NULL CHECK (due_day >= 1 AND due_day <= 31),
+    color text NOT NULL DEFAULT '#3B82F6'
+    ::text,
+  created_at timestamp
+    with time zone DEFAULT now
+    (),
+  updated_at timestamp
+    with time zone DEFAULT now
+    (),
+  CONSTRAINT credit_cards_pkey PRIMARY KEY
+    (id),
+  CONSTRAINT credit_cards_user_id_fkey FOREIGN KEY
+    (user_id) REFERENCES auth.users
+    (id)
 );
-
--- Criar índices para melhor performance
-CREATE INDEX
-IF NOT EXISTS idx_credit_cards_user_id ON credit_cards
-(user_id);
-CREATE INDEX
-IF NOT EXISTS idx_credit_card_expenses_user_id ON credit_card_expenses
-(user_id);
-CREATE INDEX
-IF NOT EXISTS idx_credit_card_expenses_credit_card_id ON credit_card_expenses
-(credit_card_id);
-CREATE INDEX
-IF NOT EXISTS idx_credit_card_expenses_date ON credit_card_expenses
-(date);
-
--- Criar função para atualizar o campo updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column
-()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW
-();
-RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- Criar triggers para atualizar o campo updated_at
-CREATE TRIGGER update_credit_cards_updated_at
-  BEFORE
-UPDATE ON credit_cards
-  FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column
-();
-
-CREATE TRIGGER update_credit_card_expenses_updated_at
-  BEFORE
-UPDATE ON credit_card_expenses
-  FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column
-();
-
--- Habilitar RLS (Row Level Security)
-ALTER TABLE credit_cards ENABLE ROW LEVEL SECURITY;
-ALTER TABLE credit_card_expenses ENABLE ROW LEVEL SECURITY;
-
--- Criar políticas de segurança para credit_cards
-CREATE POLICY "Users can view their own credit cards" ON credit_cards
-  FOR
-SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert their own credit cards" ON credit_cards
-  FOR
-INSERT WITH CHECK (auth.uid() =
-user_id);
-
-CREATE POLICY "Users can update their own credit cards" ON credit_cards
-  FOR
-UPDATE USING (auth.uid()
-= user_id);
-
-CREATE POLICY "Users can delete their own credit cards" ON credit_cards
-  FOR
-DELETE USING (auth.uid
-() = user_id);
-
--- Criar políticas de segurança para credit_card_expenses
-CREATE POLICY "Users can view their own credit card expenses" ON credit_card_expenses
-  FOR
-SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert their own credit card expenses" ON credit_card_expenses
-  FOR
-INSERT WITH CHECK (auth.uid() =
-user_id);
-
-CREATE POLICY "Users can update their own credit card expenses" ON credit_card_expenses
-  FOR
-UPDATE USING (auth.uid()
-= user_id);
-
-CREATE POLICY "Users can delete their own credit card expenses" ON credit_card_expenses
-  FOR
-DELETE USING (auth.uid
-() = user_id);
+    CREATE TABLE public.goals
+    (
+      id uuid NOT NULL DEFAULT gen_random_uuid(),
+      user_id uuid NOT NULL,
+      name text NOT NULL,
+      target numeric NOT NULL CHECK (target > 0
+      ::numeric),
+  current numeric NOT NULL DEFAULT 0 CHECK
+      (current >= 0::numeric),
+  type text NOT NULL CHECK
+      (type = ANY
+      (ARRAY['emergency'::text, 'investment'::text, 'recovery'::text, 'custom'::text])),
+  created_at timestamp
+      with time zone NOT NULL DEFAULT now
+      (),
+  updated_at timestamp
+      with time zone NOT NULL DEFAULT now
+      (),
+  CONSTRAINT goals_pkey PRIMARY KEY
+      (id),
+  CONSTRAINT goals_user_id_fkey FOREIGN KEY
+      (user_id) REFERENCES auth.users
+      (id)
+);
+      CREATE TABLE public.profiles
+      (
+        id uuid NOT NULL DEFAULT gen_random_uuid(),
+        user_id uuid NOT NULL UNIQUE,
+        display_name text,
+        avatar_url text,
+        created_at timestamp
+        with time zone NOT NULL DEFAULT now
+        (),
+  updated_at timestamp
+        with time zone NOT NULL DEFAULT now
+        (),
+  CONSTRAINT profiles_pkey PRIMARY KEY
+        (id),
+  CONSTRAINT profiles_user_id_fkey FOREIGN KEY
+        (user_id) REFERENCES auth.users
+        (id)
+);
+        CREATE TABLE public.transactions
+        (
+          id uuid NOT NULL DEFAULT gen_random_uuid(),
+          user_id uuid NOT NULL,
+          type text NOT NULL CHECK (type = ANY (ARRAY['income'::text, 'expense'::text])
+        )
+        ,
+  amount numeric NOT NULL CHECK
+        (amount > 0::numeric),
+  category text NOT NULL,
+  description text,
+  date date NOT NULL DEFAULT CURRENT_DATE,
+  created_at timestamp
+        with time zone NOT NULL DEFAULT now
+        (),
+  updated_at timestamp
+        with time zone NOT NULL DEFAULT now
+        (),
+  CONSTRAINT transactions_pkey PRIMARY KEY
+        (id),
+  CONSTRAINT transactions_user_id_fkey FOREIGN KEY
+        (user_id) REFERENCES auth.users
+        (id)
+);

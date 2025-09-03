@@ -26,6 +26,17 @@ export interface CreditCard {
   created_at: string;
 }
 
+export interface BankAccount {
+  id: string;
+  user_id: string;
+  name: string;
+  bank_name: string;
+  account_type: 'checking' | 'savings' | 'investment';
+  current_balance: number;
+  color: string;
+  created_at: string;
+}
+
 export interface CreditCardExpense {
   id: string;
   user_id: string;
