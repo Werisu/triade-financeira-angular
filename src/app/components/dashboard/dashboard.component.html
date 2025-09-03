@@ -240,27 +240,50 @@
           >
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-2xl font-bold text-foreground">Transações Recentes</h2>
-              <button
-                (click)="showTransactionForm = true"
-                class="group bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
-              >
-                <div class="flex items-center space-x-2">
-                  <svg
-                    class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <span>Nova Transação</span>
-                </div>
-              </button>
+              <div class="flex space-x-3">
+                <button
+                  (click)="showTransactionsManager = true"
+                  class="group bg-gradient-to-r from-secondary-500 to-secondary-600 text-white px-4 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <div class="flex items-center space-x-2">
+                    <svg
+                      class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                      />
+                    </svg>
+                    <span>Gerenciar</span>
+                  </div>
+                </button>
+                <button
+                  (click)="showTransactionForm = true"
+                  class="group bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <div class="flex items-center space-x-2">
+                    <svg
+                      class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    <span>Nova Transação</span>
+                  </div>
+                </button>
+              </div>
             </div>
 
             <div *ngIf="transactions.length === 0" class="text-center py-12">
@@ -456,6 +479,13 @@
       [userId]="currentUser?.id || ''"
       (close)="showGoalForm = false"
       (saved)="onGoalSaved($event)"
+    />
+
+    <!-- Transactions Manager Modal -->
+    <app-transactions-manager
+      *ngIf="showTransactionsManager"
+      [userId]="currentUser?.id || ''"
+      (close)="onTransactionsManagerClosed()"
     />
   </div>
 </div>

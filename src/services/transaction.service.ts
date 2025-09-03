@@ -57,6 +57,33 @@ export class TransactionService {
     }
   }
 
+  async updateTransaction(
+    id: string,
+    transaction: Partial<Omit<Transaction, 'id' | 'created_at' | 'user_id'>>
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { data, error } = await this.supabaseService
+        .getClient()
+        .from('transactions')
+        .update(transaction as any)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const currentTransactions = this.transactionsSubject.value;
+      const updatedTransactions = currentTransactions.map((t) =>
+        t.id === id ? { ...t, ...data } : t
+      );
+      this.transactionsSubject.next(updatedTransactions);
+
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async deleteTransaction(id: string): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await this.supabaseService

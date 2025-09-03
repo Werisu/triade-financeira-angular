@@ -86,9 +86,25 @@ export class TransactionFormComponent {
       };
 
       if (this.transaction) {
-        // TODO: Implementar atualização de transação
-        console.log('Atualizar transação:', transactionData);
+        // Modo edição
+        const result = await this.transactionService.updateTransaction(this.transaction.id, {
+          type: this.transactionData.type,
+          amount: this.transactionData.amount,
+          category: this.transactionData.category,
+          description: this.transactionData.description,
+          date: this.transactionData.date,
+        });
+
+        if (result.success) {
+          this.success = 'Transação atualizada com sucesso!';
+          setTimeout(() => {
+            this.close.emit();
+          }, 1500);
+        } else {
+          this.error = result.error || 'Erro ao atualizar transação';
+        }
       } else {
+        // Modo criação
         const result = await this.transactionService.addTransaction(transactionData);
 
         if (result.success) {

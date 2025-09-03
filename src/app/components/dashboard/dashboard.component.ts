@@ -12,6 +12,7 @@ import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.co
 import { CreditCardsManagerComponent } from '../credit-cards-manager/credit-cards-manager.component';
 import { GoalFormComponent } from '../goal-form/goal-form.component';
 import { TransactionFormComponent } from '../transaction-form/transaction-form.component';
+import { TransactionsManagerComponent } from '../transactions-manager/transactions-manager.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,6 +20,7 @@ import { TransactionFormComponent } from '../transaction-form/transaction-form.c
   imports: [
     CommonModule,
     TransactionFormComponent,
+    TransactionsManagerComponent,
     GoalFormComponent,
     CreditCardFormComponent,
     CreditCardExpenseFormComponent,
@@ -53,6 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Estado dos modais
   showTransactionForm = false;
+  showTransactionsManager = false;
   showGoalForm = false;
   showCreditCardForm = false;
   showCreditCardExpenseForm = false;
@@ -181,6 +184,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onTransactionSaved(transaction: Transaction) {
     // A transação já foi salva pelo serviço, apenas fechar o modal
     this.showTransactionForm = false;
+  }
+
+  onTransactionsManagerClosed() {
+    this.showTransactionsManager = false;
   }
 
   onGoalSaved(goal: Goal) {
