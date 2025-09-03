@@ -29,6 +29,7 @@ export class TransactionFormComponent {
     category: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
+    payment_status: 'pending' as 'pending' | 'paid',
   };
 
   categories = [
@@ -52,6 +53,7 @@ export class TransactionFormComponent {
         category: this.transaction.category,
         description: this.transaction.description || '',
         date: this.transaction.date,
+        payment_status: this.transaction.payment_status || 'pending',
       };
     }
   }
@@ -83,6 +85,7 @@ export class TransactionFormComponent {
         category: this.transactionData.category,
         description: this.transactionData.description,
         date: this.transactionData.date,
+        payment_status: this.transactionData.payment_status,
       };
 
       if (this.transaction) {
@@ -93,6 +96,7 @@ export class TransactionFormComponent {
           category: this.transactionData.category,
           description: this.transactionData.description,
           date: this.transactionData.date,
+          payment_status: this.transactionData.payment_status,
         });
 
         if (result.success) {

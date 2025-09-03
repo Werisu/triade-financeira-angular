@@ -141,6 +141,7 @@ export class CreditCardExpenseImportComponent implements OnInit {
           ...expense,
           user_id: this.userId,
           tags: expense.tags || [],
+          payment_status: 'pending',
         });
         importedExpenses.push(newExpense);
       }

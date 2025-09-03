@@ -23,6 +23,7 @@ import { CreditCardExpensesManagerComponent } from '../credit-card-expenses-mana
 import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.component';
 import { CreditCardsManagerComponent } from '../credit-cards-manager/credit-cards-manager.component';
 import { GoalFormComponent } from '../goal-form/goal-form.component';
+import { PaymentManagerComponent } from '../payment-manager/payment-manager.component';
 import { TransactionFormComponent } from '../transaction-form/transaction-form.component';
 import { TransactionsManagerComponent } from '../transactions-manager/transactions-manager.component';
 
@@ -41,6 +42,7 @@ import { TransactionsManagerComponent } from '../transactions-manager/transactio
     CreditCardsManagerComponent,
     CreditCardExpensesListComponent,
     CreditCardExpensesManagerComponent,
+    PaymentManagerComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -81,6 +83,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showCreditCardForm = false;
   showCreditCardExpenseForm = false;
   showCreditCardExpensesManager = false;
+  showPaymentManager = false;
 
   ngOnInit() {
     this.initializeDashboard();
@@ -169,21 +172,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private calculateStats() {
-    // Calcular receitas e despesas totais (todos os meses)
+    // Calcular receitas totais (todas pagas)
     this.monthlyIncome = this.transactions
-      .filter((t) => t.type === 'income')
+      .filter((t) => t.type === 'income' && t.payment_status === 'paid')
       .reduce((sum, t) => sum + t.amount, 0);
 
-    // Calcular despesas das transações normais
+    // Calcular despesas das transações normais (apenas pagas)
     const transactionExpenses = this.transactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && t.payment_status === 'paid')
       .reduce((sum, t) => sum + t.amount, 0);
 
-    // Calcular despesas dos cartões de crédito
-    const creditCardExpenses = this.creditCardExpenses.reduce(
-      (sum, expense) => sum + expense.amount,
-      0
-    );
+    // Calcular despesas dos cartões de crédito (apenas pagas)
+    const creditCardExpenses = this.creditCardExpenses
+      .filter((expense) => expense.payment_status === 'paid')
+      .reduce((sum, expense) => sum + expense.amount, 0);
 
     // Calcular saldo total das contas bancárias
     const bankAccountBalance = this.bankAccounts.reduce(
@@ -191,10 +193,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       0
     );
 
-    // Total de despesas (transações + cartões)
+    // Total de despesas (transações + cartões pagas)
     this.monthlyExpenses = transactionExpenses + creditCardExpenses;
 
-    // Calcular saldo total (receitas - despesas + saldo das contas)
+    // Calcular saldo total (receitas - despesas pagas + saldo das contas)
     this.balance = this.monthlyIncome - this.monthlyExpenses + bankAccountBalance;
 
     // Calcular estatísticas das metas
@@ -211,14 +213,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     if (recentTransactions.length > 0 || recentCreditCardExpenses.length > 0) {
       const recentIncome = recentTransactions
-        .filter((t) => t.type === 'income')
+        .filter((t) => t.type === 'income' && t.payment_status === 'paid')
         .reduce((sum, t) => sum + t.amount, 0);
 
       const recentTransactionExpenses = recentTransactions
-        .filter((t) => t.type === 'expense')
+        .filter((t) => t.type === 'expense' && t.payment_status === 'paid')
         .reduce((sum, t) => sum + t.amount, 0);
 
-      const recentCreditExpenses = recentCreditCardExpenses.reduce((sum, e) => sum + e.amount, 0);
+      const recentCreditExpenses = recentCreditCardExpenses
+        .filter((e) => e.payment_status === 'paid')
+        .reduce((sum, e) => sum + e.amount, 0);
 
       // Incluir saldo das contas bancárias na média mensal
       const totalRecent =
@@ -277,6 +281,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   onBankAccountsManagerClosed() {
     this.showBankAccountsManager = false;
+  }
+
+  onPaymentManagerClosed() {
+    this.showPaymentManager = false;
   }
 
   formatCurrency(amount: number): string {

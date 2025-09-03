@@ -12,6 +12,7 @@ export interface Transaction {
   category: string;
   description: string | null;
   date: string;
+  payment_status: 'pending' | 'paid';
   created_at: string;
 }
 
@@ -48,6 +49,7 @@ export interface CreditCardExpense {
   installment_number?: number;
   total_installments?: number;
   date: string;
+  payment_status: 'pending' | 'paid';
   created_at: string;
   credit_cards?: {
     name: string;
@@ -63,6 +65,20 @@ export interface Goal {
   current: number;
   type: 'emergency' | 'investment' | 'recovery' | 'custom';
   created_at: string;
+}
+
+export interface CreditCardPayment {
+  id: string;
+  user_id: string;
+  credit_card_id: string;
+  amount: number;
+  payment_date: string;
+  description: string;
+  created_at: string;
+  credit_cards?: {
+    name: string;
+    color: string;
+  };
 }
 
 export interface AuthState {

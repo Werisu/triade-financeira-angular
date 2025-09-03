@@ -25,6 +25,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
     installment_number: undefined,
     total_installments: undefined,
     date: new Date().toISOString().split('T')[0],
+    payment_status: 'pending',
   };
 
   creditCards: CreditCard[] = [];
@@ -114,6 +115,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
       installment_number: undefined,
       total_installments: undefined,
       date: new Date().toISOString().split('T')[0],
+      payment_status: 'pending',
     };
     if (this.selectedCreditCardId) {
       this.expense.credit_card_id = this.selectedCreditCardId;

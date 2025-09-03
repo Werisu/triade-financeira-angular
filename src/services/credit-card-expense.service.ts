@@ -134,4 +134,126 @@ export class CreditCardExpenseService {
     if (error) throw error;
     return data || [];
   }
+
+  async markExpenseAsPaid(id: string): Promise<CreditCardExpense> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) throw new Error('Usuário não autenticado');
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('credit_card_expenses')
+      .update({ payment_status: 'paid' })
+      .eq('id', id)
+      .eq('user_id', currentUser.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async markExpenseAsPending(id: string): Promise<CreditCardExpense> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) throw new Error('Usuário não autenticado');
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('credit_card_expenses')
+      .update({ payment_status: 'pending' })
+      .eq('id', id)
+      .eq('user_id', currentUser.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async getPendingExpenses(): Promise<CreditCardExpense[]> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) throw new Error('Usuário não autenticado');
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('credit_card_expenses')
+      .select(
+        `
+        *,
+        credit_cards (
+          name,
+          color
+        )
+      `
+      )
+      .eq('user_id', currentUser.id)
+      .eq('payment_status', 'pending')
+      .order('date', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  async getPaidExpenses(): Promise<CreditCardExpense[]> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) throw new Error('Usuário não autenticado');
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('credit_card_expenses')
+      .select(
+        `
+        *,
+        credit_cards (
+          name,
+          color
+        )
+      `
+      )
+      .eq('user_id', currentUser.id)
+      .eq('payment_status', 'paid')
+      .order('date', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  async markAllExpensesAsPaid(creditCardId: string): Promise<void> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) throw new Error('Usuário não autenticado');
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('credit_card_expenses')
+      .update({ payment_status: 'paid' })
+      .eq('user_id', currentUser.id)
+      .eq('credit_card_id', creditCardId)
+      .eq('payment_status', 'pending');
+
+    if (error) throw error;
+  }
+
+  async getPendingExpensesByCard(creditCardId: string): Promise<CreditCardExpense[]> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) throw new Error('Usuário não autenticado');
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('credit_card_expenses')
+      .select(
+        `
+        *,
+        credit_cards (
+          name,
+          color
+        )
+      `
+      )
+      .eq('user_id', currentUser.id)
+      .eq('credit_card_id', creditCardId)
+      .eq('payment_status', 'pending')
+      .order('date', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
 }
