@@ -3,6 +3,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { CreditCardExpenseService } from '../../../services/credit-card-expense.service';
 import { GoalService } from '../../../services/goal.service';
 import { TransactionService } from '../../../services/transaction.service';
 import { CreditCard, CreditCardExpense, Goal, Transaction, User } from '../../../types';
@@ -37,6 +38,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private transactionService = inject(TransactionService);
   private goalService = inject(GoalService);
+  private creditCardExpenseService = inject(CreditCardExpenseService);
 
   private destroy$ = new Subject<void>();
 
@@ -46,6 +48,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Dados reais
   transactions: Transaction[] = [];
   goals: Goal[] = [];
+  creditCardExpenses: CreditCardExpense[] = [];
 
   // Dados calculados
   balance = 0;
@@ -90,8 +93,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private async loadUserData(userId: string) {
     try {
-      // Carregar transações e metas em paralelo
-      await Promise.all([this.loadTransactions(userId), this.loadGoals(userId)]);
+      // Carregar transações, metas e gastos dos cartões em paralelo
+      await Promise.all([
+        this.loadTransactions(userId),
+        this.loadGoals(userId),
+        this.loadCreditCardExpenses(userId),
+      ]);
 
       // Calcular estatísticas
       this.calculateStats();
@@ -126,17 +133,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private calculateStats() {
-    if (!this.transactions.length) return;
+  private async loadCreditCardExpenses(userId: string) {
+    try {
+      this.creditCardExpenses = await this.creditCardExpenseService.getCreditCardExpenses();
+      this.calculateStats();
+    } catch (error) {
+      console.error('Erro ao carregar gastos dos cartões:', error);
+    }
+  }
 
+  private calculateStats() {
     // Calcular receitas e despesas totais (todos os meses)
     this.monthlyIncome = this.transactions
       .filter((t) => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
 
-    this.monthlyExpenses = this.transactions
+    // Calcular despesas das transações normais
+    const transactionExpenses = this.transactions
       .filter((t) => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
+
+    // Calcular despesas dos cartões de crédito
+    const creditCardExpenses = this.creditCardExpenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
+
+    // Total de despesas (transações + cartões)
+    this.monthlyExpenses = transactionExpenses + creditCardExpenses;
 
     // Calcular saldo total
     this.balance = this.monthlyIncome - this.monthlyExpenses;
@@ -149,16 +173,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const now = new Date();
     const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
     const recentTransactions = this.transactions.filter((t) => new Date(t.date) >= threeMonthsAgo);
+    const recentCreditCardExpenses = this.creditCardExpenses.filter(
+      (e) => new Date(e.date) >= threeMonthsAgo
+    );
 
-    if (recentTransactions.length > 0) {
-      const totalRecent =
-        recentTransactions
-          .filter((t) => t.type === 'income')
-          .reduce((sum, t) => sum + t.amount, 0) -
-        recentTransactions
-          .filter((t) => t.type === 'expense')
-          .reduce((sum, t) => sum + t.amount, 0);
+    if (recentTransactions.length > 0 || recentCreditCardExpenses.length > 0) {
+      const recentIncome = recentTransactions
+        .filter((t) => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
 
+      const recentTransactionExpenses = recentTransactions
+        .filter((t) => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      const recentCreditExpenses = recentCreditCardExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+      const totalRecent = recentIncome - (recentTransactionExpenses + recentCreditExpenses);
       this.averageMonthly = totalRecent / 3;
     }
   }
@@ -192,8 +222,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onCreditCardExpenseCreated(expense: CreditCardExpense) {
-    // O gasto foi criado, fechar o modal
+    // O gasto foi criado, fechar o modal e recarregar dados
     this.showCreditCardExpenseForm = false;
+    if (this.currentUser) {
+      this.loadCreditCardExpenses(this.currentUser.id);
+    }
   }
 
   onCreditCardExpensesManagerClosed() {
