@@ -129,36 +129,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private calculateStats() {
     if (!this.transactions.length) return;
 
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    // Calcular receitas e despesas do mês atual
-    const monthlyTransactions = this.transactions.filter((t) => {
-      const transactionDate = new Date(t.date);
-      return (
-        transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear
-      );
-    });
-
-    this.monthlyIncome = monthlyTransactions
+    // Calcular receitas e despesas totais (todos os meses)
+    this.monthlyIncome = this.transactions
       .filter((t) => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
 
-    this.monthlyExpenses = monthlyTransactions
+    this.monthlyExpenses = this.transactions
       .filter((t) => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
 
     // Calcular saldo total
-    this.balance =
-      this.transactions.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) -
-      this.transactions.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    this.balance = this.monthlyIncome - this.monthlyExpenses;
 
     // Calcular estatísticas das metas
     this.activeGoals = this.goals.length;
     this.completedGoals = this.goals.filter((g) => g.current >= g.target).length;
 
     // Calcular média mensal (últimos 3 meses)
+    const now = new Date();
     const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
     const recentTransactions = this.transactions.filter((t) => new Date(t.date) >= threeMonthsAgo);
 
