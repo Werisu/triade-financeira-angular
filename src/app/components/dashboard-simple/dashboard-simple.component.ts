@@ -1,4 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { BankAccountService } from '../../../services/bank-account.service';
@@ -12,7 +13,7 @@ import { PaymentManagerComponent } from '../payment-manager/payment-manager.comp
 @Component({
   selector: 'app-dashboard-simple',
   standalone: true,
-  imports: [NavigationComponent, PaymentManagerComponent],
+  imports: [NavigationComponent, PaymentManagerComponent, RouterLink],
   templateUrl: './dashboard-simple.component.html',
   styleUrls: ['./dashboard-simple.component.css'],
 })
@@ -26,7 +27,6 @@ export class DashboardSimpleComponent implements OnInit, OnDestroy {
 
   currentUser: User | null = null;
   loading = false;
-  currentView = 'dashboard';
 
   // Dados financeiros
   transactions: Transaction[] = [];
@@ -143,10 +143,6 @@ export class DashboardSimpleComponent implements OnInit, OnDestroy {
 
     // Média mensal (simplificada)
     this.averageMonthly = this.monthlyIncome - this.monthlyExpenses;
-  }
-
-  onNavigate(view: string) {
-    this.currentView = view;
   }
 
   onPaymentManagerClosed() {

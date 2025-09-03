@@ -11,45 +11,8 @@
   <router-outlet />
 </main>
 } @if (authService.isAuthenticated()) {
-<!-- Dashboard View -->
-@if (currentView === 'dashboard') {
-<app-dashboard-simple (navigate)="onNavigate($any($event))"> </app-dashboard-simple>
-}
-
-<!-- Transactions View -->
-@if (currentView === 'transactions') {
-<app-transactions-page
-  [userId]="authService.getCurrentUser()?.id || ''"
-  (backToDashboard)="onBackToDashboard()"
->
-</app-transactions-page>
-}
-
-<!-- Credit Cards View -->
-@if (currentView === 'credit-cards') {
-<app-credit-cards-page
-  [userId]="authService.getCurrentUser()?.id || ''"
-  (backToDashboard)="onBackToDashboard()"
->
-</app-credit-cards-page>
-}
-
-<!-- Placeholder for other views -->
-@if ( currentView !== 'dashboard' && currentView !== 'transactions' && currentView !==
-'credit-cards' ) {
-<div class="min-h-screen bg-gray-50 flex items-center justify-center">
-  <div class="text-center">
-    <div class="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-      <span class="text-4xl">🚧</span>
-    </div>
-    <h2 class="text-2xl font-bold text-gray-800 mb-2">Em Desenvolvimento</h2>
-    <p class="text-gray-600 mb-4">Esta seção será implementada em breve</p>
-    <button
-      (click)="onBackToDashboard()"
-      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-    >
-      Voltar ao Dashboard
-    </button>
-  </div>
-</div>
-} } }
+<app-header></app-header>
+<main class="min-h-screen bg-gray-50">
+  <router-outlet />
+</main>
+} }

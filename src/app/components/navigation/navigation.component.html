@@ -6,8 +6,10 @@
 
   <nav class="space-y-2">
     @for (item of menuItems; track item.id) {
-    <button
-      (click)="onNavigate(item.id)"
+    <a
+      [routerLink]="item.route"
+      routerLinkActive="bg-blue-50 text-blue-700"
+      [routerLinkActiveOptions]="{ exact: item.route === '/' }"
       class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors group"
     >
       <span class="text-2xl group-hover:scale-110 transition-transform">{{ item.icon }}</span>
@@ -15,7 +17,7 @@
         <div class="font-medium">{{ item.label }}</div>
         <div class="text-sm text-gray-500 group-hover:text-blue-600">{{ item.description }}</div>
       </div>
-    </button>
+    </a>
     }
   </nav>
 </div>

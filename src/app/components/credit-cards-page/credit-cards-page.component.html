@@ -1,25 +1,9 @@
 <div class="space-y-6">
   <!-- Header -->
   <div class="flex items-center justify-between">
-    <div class="flex items-center space-x-4">
-      <button
-        (click)="goBack()"
-        class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        title="Voltar ao Dashboard"
-      >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </button>
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800">Cartões de Crédito</h1>
-        <p class="text-gray-600">Gerencie seus cartões e gastos</p>
-      </div>
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">Cartões de Crédito</h1>
+      <p class="text-gray-600">Gerencie seus cartões e gastos</p>
     </div>
     <div class="flex space-x-3">
       <button
@@ -126,6 +110,6 @@
   } @if (showExpenseForm) {
   <app-credit-card-expense-form (expenseCreated)="onCreditCardExpenseCreated()" />
   } @if (showExpensesManager) {
-  <app-credit-card-expenses-manager [userId]="userId || ''" (close)="onExpensesManagerClosed()" />
+  <app-credit-card-expenses-manager (close)="onExpensesManagerClosed()" />
   }
 </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CreditCardService } from '../../../services/credit-card.service';
 import { CreditCard } from '../../../types';
 import { CreditCardExpenseFormComponent } from '../credit-card-expense-form/credit-card-expense-form.component';
@@ -21,9 +21,6 @@ import { CreditCardsManagerComponent } from '../credit-cards-manager/credit-card
   styleUrls: ['./credit-cards-page.component.css'],
 })
 export class CreditCardsPageComponent implements OnInit {
-  @Input() userId?: string;
-  @Output() backToDashboard = new EventEmitter<void>();
-
   creditCards: CreditCard[] = [];
   loading = false;
   showCardForm = false;
@@ -71,9 +68,5 @@ export class CreditCardsPageComponent implements OnInit {
       style: 'currency',
       currency: 'BRL',
     }).format(credit_limit);
-  }
-
-  goBack() {
-    this.backToDashboard.emit();
   }
 }

@@ -1,25 +1,9 @@
 <div class="space-y-6">
   <!-- Header -->
   <div class="flex items-center justify-between">
-    <div class="flex items-center space-x-4">
-      <button
-        (click)="goBack()"
-        class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        title="Voltar ao Dashboard"
-      >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </button>
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800">Transações</h1>
-        <p class="text-gray-600">Gerencie suas receitas e despesas</p>
-      </div>
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">Transações</h1>
+      <p class="text-gray-600">Gerencie suas receitas e despesas</p>
     </div>
     <div class="flex space-x-3">
       <button
@@ -113,15 +97,11 @@
 
   <!-- Transaction Form Modal -->
   @if (showForm) {
-  <app-transaction-form
-    [userId]="userId || ''"
-    (close)="showForm = false"
-    (saved)="onTransactionSaved()"
-  />
+  <app-transaction-form (close)="showForm = false" (saved)="onTransactionSaved()" />
   }
 
   <!-- Transactions Manager Modal -->
   @if (showManager) {
-  <app-transactions-manager [userId]="userId || ''" (close)="onTransactionsManagerClosed()" />
+  <app-transactions-manager (close)="onTransactionsManagerClosed()" />
   }
 </div>

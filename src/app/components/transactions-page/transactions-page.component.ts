@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TransactionService } from '../../../services/transaction.service';
 import { Transaction } from '../../../types';
 import { TransactionFormComponent } from '../transaction-form/transaction-form.component';
@@ -12,9 +12,6 @@ import { TransactionsManagerComponent } from '../transactions-manager/transactio
   styleUrls: ['./transactions-page.component.css'],
 })
 export class TransactionsPageComponent implements OnInit {
-  @Input() userId?: string;
-  @Output() backToDashboard = new EventEmitter<void>();
-
   transactions: Transaction[] = [];
   loading = false;
   showForm = false;
@@ -56,9 +53,5 @@ export class TransactionsPageComponent implements OnInit {
 
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString('pt-BR');
-  }
-
-  goBack() {
-    this.backToDashboard.emit();
   }
 }
