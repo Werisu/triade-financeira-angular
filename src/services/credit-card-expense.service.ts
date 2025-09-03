@@ -44,6 +44,14 @@ export class CreditCardExpenseService {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) throw new Error('Usuário não autenticado');
 
+    // Validar se a data é válida antes de inserir
+    const date = new Date(expense.date);
+    if (isNaN(date.getTime())) {
+      throw new Error(`Data inválida: ${expense.date}`);
+    }
+
+    console.log(`Criando despesa com data: ${expense.date}`);
+
     const { data, error } = await this.supabase
       .getClient()
       .from('credit_card_expenses')
@@ -97,7 +105,14 @@ export class CreditCardExpenseService {
     if (!currentUser) throw new Error('Usuário não autenticado');
 
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
-    const endDate = `${year}-${month.toString().padStart(2, '0')}-31`;
+
+    // Calcular o último dia do mês corretamente
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${month.toString().padStart(2, '0')}-${lastDayOfMonth
+      .toString()
+      .padStart(2, '0')}`;
+
+    console.log(`Consultando gastos de ${startDate} até ${endDate}`);
 
     const { data, error } = await this.supabase
       .getClient()

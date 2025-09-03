@@ -1,0 +1,117 @@
+/* Estilos específicos para o gerenciador de despesas de cartão de crédito */
+
+.expense-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.expense-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+.sort-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.sort-button:hover {
+  background-color: #7c3aed;
+  transform: scale(1.05);
+}
+
+.action-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.action-button:hover {
+  transform: scale(1.1);
+}
+
+.credit-card-icon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expense-item {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .expense-item {
+    padding: 0.75rem;
+  }
+
+  .expense-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .expense-actions {
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* Estados de loading */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Badges e tags */
+.credit-card-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  color: white;
+  font-weight: 500;
+}
+
+.installment-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Hover effects */
+.import-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+}
+
+.add-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.3);
+}

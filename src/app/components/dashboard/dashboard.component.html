@@ -226,7 +226,30 @@
 
       <!-- Credit Card Expenses List -->
       <div class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6">
-        <h2 class="text-2xl font-bold text-foreground mb-6">Gastos com Cartão de Crédito</h2>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-foreground">Gastos com Cartão de Crédito</h2>
+          <button
+            (click)="showCreditCardExpensesManager = true"
+            class="group bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+          >
+            <div class="flex items-center space-x-2">
+              <svg
+                class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
+              </svg>
+              <span>Gerenciar</span>
+            </div>
+          </button>
+        </div>
         <app-credit-card-expenses-list></app-credit-card-expenses-list>
       </div>
 
@@ -486,6 +509,13 @@
       *ngIf="showTransactionsManager"
       [userId]="currentUser?.id || ''"
       (close)="onTransactionsManagerClosed()"
+    />
+
+    <!-- Credit Card Expenses Manager Modal -->
+    <app-credit-card-expenses-manager
+      *ngIf="showCreditCardExpensesManager"
+      [userId]="currentUser?.id || ''"
+      (close)="onCreditCardExpensesManagerClosed()"
     />
   </div>
 </div>
