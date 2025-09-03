@@ -364,13 +364,36 @@ export class ExcelImportService {
           console.log('XLSX.SSF.parse_date_code disponível:', !!XLSX.SSF?.parse_date_code);
 
           const date = XLSX.SSF.parse_date_code(dateStr);
+
+          // Validar se a data é válida
+          if (isNaN(date.getTime())) {
+            console.error(`Data inválida gerada pela XLSX: ${dateStr} -> ${date}`);
+            throw new Error('Data inválida');
+          }
+
           console.log(`Data numérica do Excel: ${dateStr} -> ${date.toISOString().split('T')[0]}`);
           return date.toISOString().split('T')[0];
         } catch (error) {
           console.error('Erro ao converter data numérica:', error);
-          // Fallback para conversão manual
-          const excelEpoch = new Date(1900, 0, 1);
-          const date = new Date(excelEpoch.getTime() + (dateStr - 1) * 24 * 60 * 60 * 1000);
+          // Fallback para conversão manual mais precisa
+          // Excel conta dias desde 1900-01-01, mas tem um bug: considera 1900 como ano bissexto
+          const excelDate = dateStr;
+          let date: Date;
+
+          if (excelDate <= 60) {
+            // Para datas até 1900-02-29, usar a data direta
+            date = new Date(1900, 0, excelDate);
+          } else {
+            // Para datas após 1900-02-29, subtrair 1 dia para corrigir o bug
+            date = new Date(1900, 0, excelDate - 1);
+          }
+
+          // Validar se a data é válida
+          if (isNaN(date.getTime())) {
+            console.error(`Data inválida gerada: ${dateStr} -> ${date}`);
+            return null;
+          }
+
           console.log(
             `Fallback - Data numérica do Excel: ${dateStr} -> ${date.toISOString().split('T')[0]}`
           );
