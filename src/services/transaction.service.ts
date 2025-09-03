@@ -103,7 +103,23 @@ export class TransactionService {
     }
   }
 
+  async markAsPaid(id: string): Promise<{ success: boolean; error?: string }> {
+    return this.updateTransaction(id, { payment_status: 'paid' });
+  }
+
+  async markAsPending(id: string): Promise<{ success: boolean; error?: string }> {
+    return this.updateTransaction(id, { payment_status: 'pending' });
+  }
+
   getTransactions(): Transaction[] {
     return this.transactionsSubject.value;
+  }
+
+  getPendingTransactions(): Transaction[] {
+    return this.transactionsSubject.value.filter((t) => t.payment_status === 'pending');
+  }
+
+  getPaidTransactions(): Transaction[] {
+    return this.transactionsSubject.value.filter((t) => t.payment_status === 'paid');
   }
 }

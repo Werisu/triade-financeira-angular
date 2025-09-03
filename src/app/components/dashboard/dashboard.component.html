@@ -40,20 +40,36 @@
             </p>
           </div>
         </div>
-        <button
-          (click)="signOut()"
-          class="group relative inline-flex items-center space-x-3 bg-gradient-to-r from-danger-500 to-danger-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          <span>Sair</span>
-        </button>
+        <div class="flex space-x-3">
+          <button
+            (click)="showPaymentManager = true"
+            class="group relative inline-flex items-center space-x-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>Pagamentos</span>
+          </button>
+          <button
+            (click)="signOut()"
+            class="group relative inline-flex items-center space-x-3 bg-gradient-to-r from-danger-500 to-danger-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            <span>Sair</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -166,6 +182,61 @@
             ></div>
           </div>
         </div>
+      </div>
+
+      <!-- Bank Accounts Section -->
+      <div class="backdrop-blur-xl bg-white/80 rounded-3xl border border-white/20 shadow-large p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-foreground">Contas Bancárias</h2>
+          <div class="flex space-x-3">
+            <button
+              (click)="showBankAccountsManager = true"
+              class="group bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="flex items-center space-x-2">
+                <svg
+                  class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                  />
+                </svg>
+                <span>Gerenciar</span>
+              </div>
+            </button>
+            <button
+              (click)="showBankAccountForm = true"
+              class="group bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                <span>Nova Conta</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bank Accounts List -->
+        <app-bank-accounts-manager *ngIf="!showBankAccountForm"></app-bank-accounts-manager>
+
+        <!-- Bank Account Form -->
+        <app-bank-account-form
+          *ngIf="showBankAccountForm"
+          (bankAccountCreated)="onBankAccountCreated($event)"
+        ></app-bank-account-form>
       </div>
 
       <!-- Credit Cards Section -->
@@ -516,6 +587,21 @@
       *ngIf="showCreditCardExpensesManager"
       [userId]="currentUser?.id || ''"
       (close)="onCreditCardExpensesManagerClosed()"
+    />
+
+    <!-- Bank Accounts Manager Modal -->
+    @if(showBankAccountsManager){
+    <app-bank-accounts-manager
+      [userId]="currentUser?.id || ''"
+      (close)="onBankAccountsManagerClosed()"
+    />
+    }
+
+    <!-- Payment Manager Modal -->
+    <app-payment-manager
+      *ngIf="showPaymentManager"
+      [userId]="currentUser?.id || ''"
+      (close)="onPaymentManagerClosed()"
     />
   </div>
 </div>

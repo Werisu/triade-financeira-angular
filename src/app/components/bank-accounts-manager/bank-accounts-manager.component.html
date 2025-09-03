@@ -1,0 +1,88 @@
+<div class="space-y-6">
+  <!-- Cabeçalho -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">Contas Bancárias</h2>
+    <div class="flex space-x-2">
+      <button
+        (click)="showForm = !showForm"
+        class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+      >
+        {{ showForm ? 'Cancelar' : 'Nova Conta' }}
+      </button>
+      <button
+        (click)="closeModal()"
+        class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+      >
+        Fechar
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulário de nova conta -->
+  <div *ngIf="showForm" class="animate-fadeIn">
+    <app-bank-account-form
+      (bankAccountCreated)="onBankAccountCreated($event)"
+    ></app-bank-account-form>
+  </div>
+
+  <!-- Lista de contas -->
+  <div *ngIf="loading" class="text-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Carregando contas...</p>
+  </div>
+
+  <div *ngIf="!loading && bankAccounts.length === 0" class="text-center py-8">
+    <p class="text-gray-500">Nenhuma conta bancária cadastrada.</p>
+    <button (click)="showForm = true" class="mt-4 text-green-600 hover:text-green-800 underline">
+      Cadastrar primeira conta
+    </button>
+  </div>
+
+  <div
+    *ngIf="!loading && bankAccounts.length > 0"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+  >
+    <div
+      *ngFor="let account of bankAccounts"
+      class="bg-white rounded-lg shadow-md p-6 border-l-4"
+      [style.border-left-color]="account.color"
+    >
+      <div class="flex justify-between items-start mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">{{ account.name }}</h3>
+        <button
+          (click)="deleteBankAccount(account.id)"
+          class="text-red-500 hover:text-red-700 transition-colors"
+          title="Excluir conta"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Banco:</span>
+          <span class="font-medium">{{ account.bank_name }}</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-gray-600">Tipo:</span>
+          <span class="font-medium">{{ getAccountTypeLabel(account.account_type) }}</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-gray-600">Saldo:</span>
+          <span class="font-bold text-lg" [class]="getBalanceColor(account.current_balance)">
+            {{ formatBalance(account.current_balance) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-500">Última atualização:</span>
+          <span class="text-sm font-medium">{{ formatDate(account.created_at) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

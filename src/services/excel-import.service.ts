@@ -333,6 +333,7 @@ export class ExcelImportService {
         tags: tags.length > 0 ? tags : undefined,
         installment_number: installmentNumber,
         total_installments: totalInstallments,
+        payment_status: 'pending',
       };
 
       if (rowNumber <= 3) {
