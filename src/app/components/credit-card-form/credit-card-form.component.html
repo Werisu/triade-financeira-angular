@@ -63,6 +63,59 @@
           </div>
         </div>
 
+        <!-- Conta Bancária -->
+        <div class="space-y-3">
+          <label for="bank_account_id" class="block text-sm font-semibold text-foreground">
+            Conta Bancária Vinculada
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                />
+              </svg>
+            </div>
+            <select
+              id="bank_account_id"
+              name="bank_account_id"
+              [(ngModel)]="creditCard.bank_account_id"
+              class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm appearance-none"
+            >
+              <option [value]="null">Selecione uma conta bancária (opcional)</option>
+              @for (account of bankAccounts; track account.id) {
+              <option [value]="account.id">{{ account.name }} - {{ account.bank_name }}</option>
+              }
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            Selecione a conta bancária que será usada para pagar a fatura deste cartão
+          </p>
+        </div>
+
         <!-- Limite -->
         <div class="space-y-3">
           <label for="credit_limit" class="block text-sm font-semibold text-foreground">

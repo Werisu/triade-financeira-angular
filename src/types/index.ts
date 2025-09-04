@@ -24,7 +24,13 @@ export interface CreditCard {
   closing_day: number;
   due_day: number;
   color: string;
+  bank_account_id: string | null;
   created_at: string;
+  bank_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
 }
 
 export interface BankAccount {

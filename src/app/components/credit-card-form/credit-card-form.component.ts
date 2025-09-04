@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
+import { BankAccountService } from '../../../services/bank-account.service';
 import { CreditCardService } from '../../../services/credit-card.service';
-import { CreditCard } from '../../../types';
+import { BankAccount, CreditCard } from '../../../types';
 
 @Component({
   selector: 'app-credit-card-form',
@@ -12,7 +13,7 @@ import { CreditCard } from '../../../types';
   templateUrl: './credit-card-form.component.html',
   styleUrls: ['./credit-card-form.component.css'],
 })
-export class CreditCardFormComponent {
+export class CreditCardFormComponent implements OnInit {
   @Output() creditCardCreated = new EventEmitter<CreditCard>();
   @Output() close = new EventEmitter<void>();
 
@@ -22,13 +23,31 @@ export class CreditCardFormComponent {
     closing_day: 1,
     due_day: 1,
     color: '#3B82F6',
+    bank_account_id: null,
   };
 
+  bankAccounts: BankAccount[] = [];
   colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
 
   loading = false;
 
-  constructor(private creditCardService: CreditCardService, private authService: AuthService) {}
+  constructor(
+    private creditCardService: CreditCardService,
+    private authService: AuthService,
+    private bankAccountService: BankAccountService
+  ) {}
+
+  async ngOnInit() {
+    await this.loadBankAccounts();
+  }
+
+  async loadBankAccounts() {
+    try {
+      this.bankAccounts = await this.bankAccountService.getBankAccountsAsync();
+    } catch (error) {
+      console.error('Erro ao carregar contas bancárias:', error);
+    }
+  }
 
   async onSubmit() {
     if (!this.creditCard.name || !this.creditCard.credit_limit) {
@@ -63,6 +82,7 @@ export class CreditCardFormComponent {
       closing_day: 1,
       due_day: 1,
       color: '#3B82F6',
+      bank_account_id: null,
     };
   }
 

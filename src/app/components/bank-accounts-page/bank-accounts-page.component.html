@@ -270,6 +270,22 @@
                   {{ formatCurrency(account.current_balance) }}
                 </span>
               </div>
+
+              @if (getLinkedCreditCards(account.id).length > 0) {
+              <div class="mt-3">
+                <span class="text-muted-foreground text-sm">Cartões vinculados:</span>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  @for (card of getLinkedCreditCards(account.id); track card.id) {
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white"
+                    [style.background-color]="card.color"
+                  >
+                    {{ card.name }}
+                  </span>
+                  }
+                </div>
+              </div>
+              }
             </div>
 
             <div class="mt-4 pt-4 border-t border-white/30">
