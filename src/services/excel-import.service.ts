@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-// @ts-ignore
-import * as XLSX from 'xlsx';
 
 export interface ImportedExpense {
   description: string;
@@ -80,45 +78,58 @@ export class ExcelImportService {
     console.log('Arquivo:', file.name, 'Tamanho:', file.size);
     console.log('Cartões disponíveis:', creditCards);
 
-    return new Promise((resolve) => {
-      const reader = new FileReader();
+    try {
+      // Lazy load XLSX library
+      const XLSX = await import('xlsx');
 
-      reader.onload = (e) => {
-        try {
-          console.log('FileReader onload executado');
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          console.log('Dados lidos:', data.length, 'bytes');
+      return new Promise((resolve) => {
+        const reader = new FileReader();
 
-          const workbook = XLSX.read(data, { type: 'array' });
-          console.log('Workbook criado:', workbook.SheetNames);
+        reader.onload = (e) => {
+          try {
+            console.log('FileReader onload executado');
+            const data = new Uint8Array(e.target?.result as ArrayBuffer);
+            console.log('Dados lidos:', data.length, 'bytes');
 
-          const result = this.processWorkbook(workbook, creditCards, XLSX);
-          console.log('Resultado do processamento:', result);
-          resolve(result);
-        } catch (error) {
-          console.error('Erro no FileReader onload:', error);
+            const workbook = XLSX.read(data, { type: 'array' });
+            console.log('Workbook criado:', workbook.SheetNames);
+
+            const result = this.processWorkbook(workbook, creditCards, XLSX);
+            console.log('Resultado do processamento:', result);
+            resolve(result);
+          } catch (error) {
+            console.error('Erro no FileReader onload:', error);
+            resolve({
+              success: false,
+              imported: [],
+              errors: [`Erro ao processar arquivo: ${error}`],
+              totalRows: 0,
+            });
+          }
+        };
+
+        reader.onerror = (error) => {
+          console.error('Erro no FileReader:', error);
           resolve({
             success: false,
             imported: [],
-            errors: [`Erro ao processar arquivo: ${error}`],
+            errors: ['Erro ao ler o arquivo'],
             totalRows: 0,
           });
-        }
-      };
+        };
 
-      reader.onerror = (error) => {
-        console.error('Erro no FileReader:', error);
-        resolve({
-          success: false,
-          imported: [],
-          errors: ['Erro ao ler o arquivo'],
-          totalRows: 0,
-        });
+        console.log('Iniciando leitura do arquivo...');
+        reader.readAsArrayBuffer(file);
+      });
+    } catch (error) {
+      console.error('Erro ao carregar biblioteca XLSX:', error);
+      return {
+        success: false,
+        imported: [],
+        errors: ['Erro ao carregar biblioteca de processamento de Excel'],
+        totalRows: 0,
       };
-
-      console.log('Iniciando leitura do arquivo...');
-      reader.readAsArrayBuffer(file);
-    });
+    }
   }
 
   private processWorkbook(
@@ -356,50 +367,27 @@ export class ExcelImportService {
     try {
       // Se for um número (data do Excel), converter
       if (typeof dateStr === 'number') {
-        try {
-          // Usar a biblioteca XLSX para converter corretamente
-          // XLSX.SSF.parse_date_code converte números do Excel para data
-          console.log('Tentando converter data numérica:', dateStr);
-          console.log('XLSX disponível:', !!XLSX);
-          console.log('XLSX.SSF disponível:', !!XLSX.SSF);
-          console.log('XLSX.SSF.parse_date_code disponível:', !!XLSX.SSF?.parse_date_code);
+        // Fallback para conversão manual mais precisa
+        // Excel conta dias desde 1900-01-01, mas tem um bug: considera 1900 como ano bissexto
+        const excelDate = dateStr;
+        let date: Date;
 
-          const date = XLSX.SSF.parse_date_code(dateStr);
-
-          // Validar se a data é válida
-          if (isNaN(date.getTime())) {
-            console.error(`Data inválida gerada pela XLSX: ${dateStr} -> ${date}`);
-            throw new Error('Data inválida');
-          }
-
-          console.log(`Data numérica do Excel: ${dateStr} -> ${date.toISOString().split('T')[0]}`);
-          return date.toISOString().split('T')[0];
-        } catch (error) {
-          console.error('Erro ao converter data numérica:', error);
-          // Fallback para conversão manual mais precisa
-          // Excel conta dias desde 1900-01-01, mas tem um bug: considera 1900 como ano bissexto
-          const excelDate = dateStr;
-          let date: Date;
-
-          if (excelDate <= 60) {
-            // Para datas até 1900-02-29, usar a data direta
-            date = new Date(1900, 0, excelDate);
-          } else {
-            // Para datas após 1900-02-29, subtrair 1 dia para corrigir o bug
-            date = new Date(1900, 0, excelDate - 1);
-          }
-
-          // Validar se a data é válida
-          if (isNaN(date.getTime())) {
-            console.error(`Data inválida gerada: ${dateStr} -> ${date}`);
-            return null;
-          }
-
-          console.log(
-            `Fallback - Data numérica do Excel: ${dateStr} -> ${date.toISOString().split('T')[0]}`
-          );
-          return date.toISOString().split('T')[0];
+        if (excelDate <= 60) {
+          // Para datas até 1900-02-29, usar a data direta
+          date = new Date(1900, 0, excelDate);
+        } else {
+          // Para datas após 1900-02-29, subtrair 1 dia para corrigir o bug
+          date = new Date(1900, 0, excelDate - 1);
         }
+
+        // Validar se a data é válida
+        if (isNaN(date.getTime())) {
+          console.error(`Data inválida gerada: ${dateStr} -> ${date}`);
+          return null;
+        }
+
+        console.log(`Data numérica do Excel: ${dateStr} -> ${date.toISOString().split('T')[0]}`);
+        return date.toISOString().split('T')[0];
       }
 
       // Tentar diferentes formatos de data
@@ -438,8 +426,11 @@ export class ExcelImportService {
     }
   }
 
-  generateTemplate(): void {
+  async generateTemplate(): Promise<void> {
     try {
+      // Lazy load XLSX library
+      const XLSX = await import('xlsx');
+
       const templateData = [
         [
           'Descrição da Transação',
