@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
 import { BankAccountService } from '../../../services/bank-account.service';
 import { TransactionService } from '../../../services/transaction.service';
 import { BankAccount, Transaction } from '../../../types';
@@ -20,6 +21,7 @@ export class TransactionFormComponent {
 
   private transactionService = inject(TransactionService);
   private bankAccountService = inject(BankAccountService);
+  private authService = inject(AuthService);
 
   loading = false;
   error = '';
@@ -101,8 +103,16 @@ export class TransactionFormComponent {
     this.success = '';
 
     try {
+      // Obter userId do AuthService se não foi fornecido via @Input
+      const userId = this.userId || this.authService.getCurrentUser()?.id;
+
+      if (!userId) {
+        this.error = 'Usuário não autenticado';
+        return;
+      }
+
       const transactionData = {
-        user_id: this.userId,
+        user_id: userId,
         type: this.transactionData.type,
         amount: this.transactionData.amount,
         category: this.transactionData.category,
