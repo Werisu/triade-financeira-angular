@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../../services/auth.service';
 import { TransactionService } from '../../../services/transaction.service';
 import { Transaction } from '../../../types';
 import { TransactionFormComponent } from '../transaction-form/transaction-form.component';
@@ -17,7 +18,7 @@ export class TransactionsPageComponent implements OnInit {
   showForm = false;
   showManager = false;
 
-  constructor(private transactionService: TransactionService) {}
+  constructor(private transactionService: TransactionService, private authService: AuthService) {}
 
   ngOnInit() {
     this.loadTransactions();
@@ -26,9 +27,10 @@ export class TransactionsPageComponent implements OnInit {
   async loadTransactions() {
     this.loading = true;
     try {
-      this.transactions = await this.transactionService.getTransactions();
+      this.transactions = await this.transactionService.getTransactionsAsync();
     } catch (error) {
       console.error('Erro ao carregar transações:', error);
+      this.transactions = [];
     } finally {
       this.loading = false;
     }

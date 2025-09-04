@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Transaction } from '../types';
+import { AuthService } from './auth.service';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({
@@ -13,7 +14,7 @@ export class TransactionService {
   public transactions$ = this.transactionsSubject.asObservable();
   public loading$ = this.loadingSubject.asObservable();
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(private supabaseService: SupabaseService, private authService: AuthService) {}
 
   async loadTransactions(userId: string): Promise<void> {
     this.loadingSubject.next(true);
@@ -112,6 +113,21 @@ export class TransactionService {
   }
 
   getTransactions(): Transaction[] {
+    return this.transactionsSubject.value;
+  }
+
+  async getTransactionsAsync(): Promise<Transaction[]> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      console.error('Usuário não autenticado');
+      return [];
+    }
+
+    // Se não há transações carregadas, carrega do banco
+    if (this.transactionsSubject.value.length === 0) {
+      await this.loadTransactions(currentUser.id);
+    }
+
     return this.transactionsSubject.value;
   }
 
