@@ -1,0 +1,250 @@
+/* Estilos para os gráficos do dashboard */
+
+/* Animações para os cards */
+.chart-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Estilos para os gráficos */
+canvas {
+  border-radius: 8px;
+}
+
+/* Estilos para o loading */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para os cards de resumo */
+.summary-card {
+  transition: all 0.3s ease-in-out;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para o estado vazio */
+.empty-state {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .chart-card {
+    margin-bottom: 1rem;
+  }
+
+  .summary-card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Estilos para os tooltips dos gráficos */
+.chartjs-tooltip {
+  background: rgba(0, 0, 0, 0.8) !important;
+  border-radius: 8px !important;
+  color: white !important;
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+}
+
+/* Estilos para as legendas */
+.chartjs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.chartjs-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.chartjs-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para os eixos dos gráficos */
+.chartjs-axis {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.chartjs-axis-title {
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Estilos para os grids */
+.chartjs-grid {
+  color: #e5e7eb;
+}
+
+/* Estilos para os pontos dos gráficos de linha */
+.chartjs-point {
+  border-width: 3px;
+  hoverborderwidth: 4px;
+}
+
+/* Estilos para as barras */
+.chartjs-bar {
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.chartjs-bar:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+/* Estilos para o gráfico de pizza */
+.chartjs-pie {
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.chartjs-pie:hover {
+  transform: scale(1.05);
+}
+
+/* Estilos para os labels dos gráficos */
+.chartjs-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Estilos para os títulos dos gráficos */
+.chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.chart-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+/* Estilos para os ícones */
+.chart-icon {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+/* Estilos para os cards de estatísticas */
+.stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: #d1d5db;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Estilos para o container dos gráficos */
+.chart-container {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+/* Estilos para os botões de ação */
+.chart-action-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chart-action-button:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para os filtros */
+.chart-filter {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chart-filter:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.chart-filter.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}

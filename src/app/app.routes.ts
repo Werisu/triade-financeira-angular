@@ -44,7 +44,7 @@ export const routes: Routes = [
   {
     path: 'goals',
     loadComponent: () =>
-      import('./components/goal-form/goal-form.component').then((m) => m.GoalFormComponent),
+      import('./components/goals-page/goals-page.component').then((m) => m.GoalsPageComponent),
     canActivate: [AuthGuard],
   },
   {

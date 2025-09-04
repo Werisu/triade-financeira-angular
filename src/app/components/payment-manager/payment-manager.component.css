@@ -30,3 +30,117 @@
 .tab-button:hover {
   transform: translateY(-1px);
 }
+
+/* Estilos personalizados para o modal */
+.shadow-large {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-soft {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(251, 146, 60, 0.3);
+}
+
+/* Animações suaves */
+@keyframes pulse-gentle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+/* Backdrop blur */
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Cores personalizadas */
+.text-muted-foreground {
+  color: rgb(115 115 115);
+}
+
+.text-foreground {
+  color: rgb(23 23 23);
+}
+
+.bg-muted\/50 {
+  background-color: rgb(245 245 245 / 0.5);
+}
+
+.bg-white\/60 {
+  background-color: rgb(255 255 255 / 0.6);
+}
+
+.bg-white\/70 {
+  background-color: rgb(255 255 255 / 0.7);
+}
+
+.bg-white\/80 {
+  background-color: rgb(255 255 255 / 0.8);
+}
+
+.border-white\/20 {
+  border-color: rgb(255 255 255 / 0.2);
+}
+
+.border-white\/30 {
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+/* Gradientes personalizados */
+.from-primary-200\/30 {
+  --tw-gradient-from: rgb(251 146 60 / 0.3);
+  --tw-gradient-to: rgb(251 146 60 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-secondary-200\/30 {
+  --tw-gradient-from: rgb(239 68 68 / 0.3);
+  --tw-gradient-to: rgb(239 68 68 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-orange-500 {
+  --tw-gradient-from: #f97316;
+  --tw-gradient-to: rgb(249 115 22 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-orange-600 {
+  --tw-gradient-to: #ea580c;
+}
+
+.from-green-500 {
+  --tw-gradient-from: #22c55e;
+  --tw-gradient-to: rgb(34 197 94 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-green-600 {
+  --tw-gradient-to: #16a34a;
+}
+
+/* Focus states */
+.focus\:ring-orange\/50:focus {
+  --tw-ring-color: rgb(251 146 60 / 0.5);
+}
+
+.focus\:border-orange\/50:focus {
+  border-color: rgb(251 146 60 / 0.5);
+}

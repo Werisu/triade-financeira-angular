@@ -16,7 +16,12 @@ export class CreditCardService {
     const { data, error } = await this.supabase
       .getClient()
       .from('credit_cards')
-      .select('*')
+      .select(
+        `
+        *,
+        bank_account:bank_accounts(name, bank_name, color)
+      `
+      )
       .eq('user_id', currentUser.id)
       .order('name');
 
@@ -35,7 +40,12 @@ export class CreditCardService {
         ...creditCard,
         user_id: currentUser.id,
       })
-      .select()
+      .select(
+        `
+        *,
+        bank_account:bank_accounts(name, bank_name, color)
+      `
+      )
       .single();
 
     if (error) throw error;
@@ -52,7 +62,12 @@ export class CreditCardService {
       .update(updates)
       .eq('id', id)
       .eq('user_id', currentUser.id)
-      .select()
+      .select(
+        `
+        *,
+        bank_account:bank_accounts(name, bank_name, color)
+      `
+      )
       .single();
 
     if (error) throw error;

@@ -15,6 +15,7 @@ import { CreditCard, CreditCardExpense } from '../../../types';
 })
 export class CreditCardExpenseFormComponent implements OnInit {
   @Input() selectedCreditCardId?: string;
+  @Input() editingExpense?: CreditCardExpense | null;
   @Output() expenseCreated = new EventEmitter<CreditCardExpense>();
   @Output() close = new EventEmitter<void>();
 
@@ -27,6 +28,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
     total_installments: undefined,
     date: new Date().toISOString().split('T')[0],
     payment_status: 'pending',
+    allocation: null,
   };
 
   creditCards: CreditCard[] = [];
@@ -54,7 +56,26 @@ export class CreditCardExpenseFormComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadCreditCards();
-    if (this.selectedCreditCardId) {
+
+    if (this.editingExpense) {
+      // Modo edição - preencher campos com dados da despesa
+      this.expense = {
+        id: this.editingExpense.id,
+        description: this.editingExpense.description,
+        amount: this.editingExpense.amount,
+        category: this.editingExpense.category,
+        credit_card_id: this.editingExpense.credit_card_id,
+        date: this.editingExpense.date,
+        tags: this.editingExpense.tags || [],
+        installment_number: this.editingExpense.installment_number,
+        total_installments: this.editingExpense.total_installments,
+        payment_status: this.editingExpense.payment_status,
+        user_id: this.editingExpense.user_id,
+        created_at: this.editingExpense.created_at,
+        allocation: this.editingExpense.allocation || null,
+      };
+    } else if (this.selectedCreditCardId) {
+      // Modo criação - apenas definir o cartão selecionado
       this.expense.credit_card_id = this.selectedCreditCardId;
     }
   }
@@ -93,15 +114,26 @@ export class CreditCardExpenseFormComponent implements OnInit {
         throw new Error('Usuário não autenticado');
       }
 
-      const newExpense = await this.expenseService.createCreditCardExpense({
-        ...this.expense,
-        user_id: currentUser.id,
-      } as Omit<CreditCardExpense, 'id' | 'created_at'>);
+      let savedExpense: CreditCardExpense;
 
-      this.expenseCreated.emit(newExpense);
+      if (this.editingExpense) {
+        // Modo edição
+        savedExpense = await this.expenseService.updateCreditCardExpense(this.editingExpense.id, {
+          ...this.expense,
+          user_id: currentUser.id,
+        } as Omit<CreditCardExpense, 'id' | 'created_at'>);
+      } else {
+        // Modo criação
+        savedExpense = await this.expenseService.createCreditCardExpense({
+          ...this.expense,
+          user_id: currentUser.id,
+        } as Omit<CreditCardExpense, 'id' | 'created_at'>);
+      }
+
+      this.expenseCreated.emit(savedExpense);
       this.resetForm();
     } catch (error) {
-      console.error('Erro ao criar gasto:', error);
+      console.error('Erro ao salvar gasto:', error);
     } finally {
       this.loading = false;
     }
@@ -117,6 +149,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
       total_installments: undefined,
       date: new Date().toISOString().split('T')[0],
       payment_status: 'pending',
+      allocation: null,
     };
     if (this.selectedCreditCardId) {
       this.expense.credit_card_id = this.selectedCreditCardId;

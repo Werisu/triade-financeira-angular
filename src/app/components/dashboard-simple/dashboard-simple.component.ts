@@ -7,13 +7,14 @@ import { CreditCardExpenseService } from '../../../services/credit-card-expense.
 import { GoalService } from '../../../services/goal.service';
 import { TransactionService } from '../../../services/transaction.service';
 import { BankAccount, CreditCardExpense, Goal, Transaction, User } from '../../../types';
+import { DashboardChartsComponent } from '../dashboard-charts/dashboard-charts.component';
 import { NavigationComponent } from '../navigation/navigation.component';
 import { PaymentManagerComponent } from '../payment-manager/payment-manager.component';
 
 @Component({
   selector: 'app-dashboard-simple',
   standalone: true,
-  imports: [NavigationComponent, PaymentManagerComponent, RouterLink],
+  imports: [NavigationComponent, PaymentManagerComponent, DashboardChartsComponent, RouterLink],
   templateUrl: './dashboard-simple.component.html',
   styleUrls: ['./dashboard-simple.component.css'],
 })
@@ -109,40 +110,75 @@ export class DashboardSimpleComponent implements OnInit, OnDestroy {
   }
 
   private calculateStats() {
-    // Filtrar apenas transações pagas
-    const paidTransactions = this.transactions.filter((t) => t.payment_status === 'paid');
-    const paidCreditCardExpenses = this.creditCardExpenses.filter(
-      (e) => e.payment_status === 'paid'
-    );
+    console.log('Calculando estatísticas...');
+    console.log('Transações:', this.transactions);
+    console.log('Cartões de crédito:', this.creditCardExpenses);
+    console.log('Contas bancárias:', this.bankAccounts);
 
-    // Calcular receitas e despesas
-    this.monthlyIncome = paidTransactions
-      .filter((t) => t.type === 'income')
+    // Obter mês e ano atual
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() retorna 0-11
+    const currentYear = currentDate.getFullYear();
+
+    // Função auxiliar para verificar se uma data está no mês atual
+    const isCurrentMonth = (dateString: string): boolean => {
+      const date = new Date(dateString);
+      return date.getMonth() + 1 === currentMonth && date.getFullYear() === currentYear;
+    };
+
+    // Calcular receitas totais do mês atual (apenas as que foram efetivamente recebidas)
+    this.monthlyIncome = this.transactions
+      .filter((t) => t.type === 'income' && t.payment_status === 'paid' && isCurrentMonth(t.date))
       .reduce((sum, t) => sum + t.amount, 0);
 
-    const transactionExpenses = paidTransactions
-      .filter((t) => t.type === 'expense')
+    // Calcular despesas das transações normais do mês atual (apenas as que foram efetivamente pagas)
+    const transactionExpenses = this.transactions
+      .filter((t) => t.type === 'expense' && t.payment_status === 'paid' && isCurrentMonth(t.date))
       .reduce((sum, t) => sum + t.amount, 0);
 
-    const creditCardExpenses = paidCreditCardExpenses.reduce((sum, e) => sum + e.amount, 0);
+    // Calcular despesas dos cartões de crédito do mês atual (apenas as que foram efetivamente pagas)
+    const creditCardExpenses = this.creditCardExpenses
+      .filter((expense) => expense.payment_status === 'paid' && isCurrentMonth(expense.date))
+      .reduce((sum, expense) => sum + expense.amount, 0);
 
-    this.monthlyExpenses = transactionExpenses + creditCardExpenses;
-
-    // Calcular saldo das contas bancárias
+    // Calcular saldo total das contas bancárias (dinheiro disponível)
     const bankAccountBalance = this.bankAccounts.reduce(
       (sum, account) => sum + account.current_balance,
       0
     );
 
-    // Saldo total
-    this.balance = this.monthlyIncome - this.monthlyExpenses + bankAccountBalance;
+    // Calcular despesas não pagas (todas que não são 'paid')
+    const unpaidTransactionExpenses = this.transactions
+      .filter((t) => t.type === 'expense' && t.payment_status !== 'paid')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const unpaidCreditCardExpenses = this.creditCardExpenses
+      .filter((expense) => expense.payment_status !== 'paid')
+      .reduce((sum, expense) => sum + expense.amount, 0);
+
+    // Total de despesas do mês atual (transações + cartões)
+    this.monthlyExpenses = transactionExpenses + creditCardExpenses;
+
+    // Calcular saldo total: apenas o saldo das contas bancárias
+    this.balance = bankAccountBalance;
+
+    // Debug: Log dos valores para verificação
+    console.log('=== DEBUG DASHBOARD ===');
+    console.log('Mês atual:', currentMonth, 'Ano atual:', currentYear);
+    console.log('Receitas do mês atual:', this.monthlyIncome);
+    console.log('Despesas do mês atual (transações):', transactionExpenses);
+    console.log('Despesas do mês atual (cartões):', creditCardExpenses);
+    console.log('Total despesas do mês atual:', this.monthlyExpenses);
+    console.log('Saldo das contas:', bankAccountBalance);
+    console.log('Saldo total (apenas contas):', this.balance);
+    console.log('========================');
 
     // Metas
     this.activeGoals = this.goals.length;
     this.completedGoals = this.goals.filter((g) => g.current >= g.target).length;
 
-    // Média mensal (simplificada)
-    this.averageMonthly = this.monthlyIncome - this.monthlyExpenses;
+    // Média mensal (simplificada) - baseada no saldo real
+    this.averageMonthly = this.balance;
   }
 
   onPaymentManagerClosed() {

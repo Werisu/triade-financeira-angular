@@ -13,7 +13,14 @@ export interface Transaction {
   description: string | null;
   date: string;
   payment_status: 'pending' | 'paid';
+  bank_account_id: string | null; // Para receitas vinculadas a contas bancárias
+  allocation: 'needs' | 'wants' | 'savings' | null; // Regra 50/30/20
   created_at: string;
+  bank_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
 }
 
 export interface CreditCard {
@@ -24,7 +31,13 @@ export interface CreditCard {
   closing_day: number;
   due_day: number;
   color: string;
+  bank_account_id: string | null;
   created_at: string;
+  bank_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
 }
 
 export interface BankAccount {
@@ -50,6 +63,7 @@ export interface CreditCardExpense {
   total_installments?: number;
   date: string;
   payment_status: 'pending' | 'paid';
+  allocation: 'needs' | 'wants' | 'savings' | null; // Regra 50/30/20
   created_at: string;
   credit_cards?: {
     name: string;
@@ -78,6 +92,54 @@ export interface CreditCardPayment {
   credit_cards?: {
     name: string;
     color: string;
+  };
+}
+
+export interface BankTransfer {
+  id: string;
+  user_id: string;
+  from_account_id: string;
+  to_account_id: string;
+  amount: number;
+  description: string | null;
+  transfer_date: string;
+  created_at: string;
+  from_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
+  to_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
+}
+
+export interface BankMovement {
+  id: string;
+  user_id: string;
+  bank_account_id: string;
+  type: 'deposit' | 'withdrawal' | 'transfer_in' | 'transfer_out';
+  amount: number;
+  description: string | null;
+  movement_date: string;
+  transfer_id: string | null;
+  created_at: string;
+  bank_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
+  transfer?: {
+    from_account: {
+      name: string;
+      bank_name: string;
+    };
+    to_account: {
+      name: string;
+      bank_name: string;
+    };
   };
 }
 

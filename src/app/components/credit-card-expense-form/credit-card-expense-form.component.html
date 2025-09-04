@@ -7,7 +7,9 @@
     <div class="p-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold text-foreground">Novo Gasto com Cartão</h2>
+        <h2 class="text-2xl font-bold text-foreground">
+          {{ editingExpense ? 'Editar Gasto com Cartão' : 'Novo Gasto com Cartão' }}
+        </h2>
         <button
           (click)="close.emit()"
           class="w-10 h-10 rounded-full bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center justify-center group hover:scale-110"
@@ -232,6 +234,64 @@
           </div>
         </div>
 
+        <!-- Alocação 50/30/20 -->
+        <div class="space-y-3">
+          <label class="block text-sm font-semibold text-foreground">Alocação 50/30/20</label>
+          <div class="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              (click)="expense.allocation = 'needs'"
+              [class]="
+                expense.allocation === 'needs'
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-glow scale-105'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+              "
+              class="py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="text-center">
+                <div class="text-lg mb-1">🏠</div>
+                <div class="text-xs font-bold">50%</div>
+                <div class="text-xs">Necessidades</div>
+              </div>
+            </button>
+            <button
+              type="button"
+              (click)="expense.allocation = 'wants'"
+              [class]="
+                expense.allocation === 'wants'
+                  ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-glow scale-105'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+              "
+              class="py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="text-center">
+                <div class="text-lg mb-1">🎯</div>
+                <div class="text-xs font-bold">30%</div>
+                <div class="text-xs">Desejos</div>
+              </div>
+            </button>
+            <button
+              type="button"
+              (click)="expense.allocation = 'savings'"
+              [class]="
+                expense.allocation === 'savings'
+                  ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-glow scale-105'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+              "
+              class="py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="text-center">
+                <div class="text-lg mb-1">💰</div>
+                <div class="text-xs font-bold">20%</div>
+                <div class="text-xs">Poupança</div>
+              </div>
+            </button>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            Selecione a categoria de alocação para este gasto conforme a regra 50/30/20
+          </p>
+        </div>
+
         <!-- Parcelas -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-3">
@@ -363,7 +423,15 @@
                 class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"
               ></div>
               }
-              <span>{{ loading ? 'Cadastrando...' : 'Cadastrar Gasto' }}</span>
+              <span>{{
+                loading
+                  ? editingExpense
+                    ? 'Salvando...'
+                    : 'Cadastrando...'
+                  : editingExpense
+                  ? 'Salvar Alterações'
+                  : 'Cadastrar Gasto'
+              }}</span>
             </div>
           </button>
         </div>

@@ -1,47 +1,104 @@
 import { Component, OnInit } from '@angular/core';
 import { BankAccountService } from '../../../services/bank-account.service';
-import { BankAccount } from '../../../types';
+import { BankTransferService } from '../../../services/bank-transfer.service';
+import { CreditCardService } from '../../../services/credit-card.service';
+import { BankAccount, CreditCard } from '../../../types';
 import { BankAccountFormComponent } from '../bank-account-form/bank-account-form.component';
 import { BankAccountsManagerComponent } from '../bank-accounts-manager/bank-accounts-manager.component';
+import { BankMovementsHistoryComponent } from '../bank-movements-history/bank-movements-history.component';
+import { BankTransferFormComponent } from '../bank-transfer-form/bank-transfer-form.component';
 
 @Component({
   selector: 'app-bank-accounts-page',
   standalone: true,
-  imports: [BankAccountFormComponent, BankAccountsManagerComponent],
+  imports: [
+    BankAccountFormComponent,
+    BankAccountsManagerComponent,
+    BankTransferFormComponent,
+    BankMovementsHistoryComponent,
+  ],
   templateUrl: './bank-accounts-page.component.html',
   styleUrls: ['./bank-accounts-page.component.css'],
 })
 export class BankAccountsPageComponent implements OnInit {
   bankAccounts: BankAccount[] = [];
+  creditCards: CreditCard[] = [];
   loading = false;
   showForm = false;
   showManager = false;
+  showTransferForm = false;
+  showHistory = false;
+  selectedAccountId?: string;
 
-  constructor(private bankAccountService: BankAccountService) {}
+  constructor(
+    private bankAccountService: BankAccountService,
+    private bankTransferService: BankTransferService,
+    private creditCardService: CreditCardService
+  ) {}
 
   ngOnInit() {
-    this.loadBankAccounts();
+    this.loadData();
   }
 
-  async loadBankAccounts() {
+  async loadData() {
     this.loading = true;
     try {
-      this.bankAccounts = await this.bankAccountService.getBankAccounts();
+      await Promise.all([this.loadBankAccounts(), this.loadCreditCards()]);
     } catch (error) {
-      console.error('Erro ao carregar contas bancárias:', error);
+      console.error('Erro ao carregar dados:', error);
     } finally {
       this.loading = false;
     }
   }
 
+  async loadBankAccounts() {
+    try {
+      this.bankAccounts = await this.bankAccountService.getBankAccounts();
+    } catch (error) {
+      console.error('Erro ao carregar contas bancárias:', error);
+    }
+  }
+
+  async loadCreditCards() {
+    try {
+      this.creditCards = await this.creditCardService.getCreditCards();
+    } catch (error) {
+      console.error('Erro ao carregar cartões de crédito:', error);
+    }
+  }
+
   onBankAccountSaved() {
-    this.loadBankAccounts();
+    this.loadData();
     this.showForm = false;
   }
 
   onBankAccountsManagerClosed() {
     this.showManager = false;
-    this.loadBankAccounts();
+    this.loadData();
+  }
+
+  onTransferCreated() {
+    this.showTransferForm = false;
+    this.loadData();
+  }
+
+  onTransferFormClosed() {
+    this.showTransferForm = false;
+  }
+
+  onHistoryClosed() {
+    this.showHistory = false;
+    this.selectedAccountId = undefined;
+  }
+
+  showAccountHistory(accountId: string) {
+    this.selectedAccountId = accountId;
+    this.showHistory = true;
+  }
+
+  showAllHistory() {
+    this.selectedAccountId = undefined;
+    this.showHistory = true;
   }
 
   formatCurrency(amount: number): string {
@@ -76,5 +133,9 @@ export class BankAccountsPageComponent implements OnInit {
 
   getPositiveBalanceAccountsCount(): number {
     return this.bankAccounts.filter((account) => account.current_balance > 0).length;
+  }
+
+  getLinkedCreditCards(accountId: string): CreditCard[] {
+    return this.creditCards.filter((card) => card.bank_account_id === accountId);
   }
 }

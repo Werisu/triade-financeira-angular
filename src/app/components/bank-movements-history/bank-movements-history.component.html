@@ -1,0 +1,290 @@
+<!-- Modal para Histórico de Movimentações -->
+<div
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
+>
+  <div
+    class="backdrop-blur-xl bg-white/90 rounded-3xl shadow-large border border-white/20 w-full max-w-6xl max-h-[90vh] overflow-hidden animate-scale-in"
+  >
+    <div class="p-8 h-full flex flex-col">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-foreground">Histórico de Movimentações</h2>
+          <p class="text-muted-foreground mt-1">
+            @if (accountId) { Movimentações da conta selecionada } @else { Todas as movimentações e
+            transferências }
+          </p>
+        </div>
+        <button
+          (click)="close.emit()"
+          class="w-10 h-10 rounded-full bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center justify-center group hover:scale-110"
+        >
+          <svg
+            class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex space-x-1 mb-6 bg-muted/30 rounded-2xl p-1">
+        <button
+          (click)="selectedTab = 'movements'"
+          [class]="
+            selectedTab === 'movements'
+              ? 'bg-white shadow-soft text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          "
+          class="flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-300"
+        >
+          <div class="flex items-center justify-center space-x-2">
+            <span>💳</span>
+            <span>Movimentações</span>
+            <span class="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded-full">{{
+              getFilteredMovements().length
+            }}</span>
+          </div>
+        </button>
+        <button
+          (click)="selectedTab = 'transfers'"
+          [class]="
+            selectedTab === 'transfers'
+              ? 'bg-white shadow-soft text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          "
+          class="flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-300"
+        >
+          <div class="flex items-center justify-center space-x-2">
+            <span>🔄</span>
+            <span>Transferências</span>
+            <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">{{
+              getFilteredTransfers().length
+            }}</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      @if (loading) {
+      <div class="flex-1 flex items-center justify-center">
+        <div class="relative">
+          <div class="w-16 h-16 border-4 border-primary-200 rounded-full animate-spin"></div>
+          <div
+            class="absolute top-0 left-0 w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"
+          ></div>
+        </div>
+      </div>
+      }
+
+      <!-- Content -->
+      @if (!loading) {
+      <div class="flex-1 overflow-y-auto">
+        <!-- Movimentações Tab -->
+        @if (selectedTab === 'movements') { @if (getFilteredMovements().length === 0) {
+        <div class="text-center py-12">
+          <div
+            class="w-24 h-24 mx-auto mb-4 bg-muted/50 rounded-full flex items-center justify-center"
+          >
+            <span class="text-4xl">💳</span>
+          </div>
+          <p class="text-lg font-medium text-muted-foreground">Nenhuma movimentação encontrada</p>
+          <p class="text-sm text-muted-foreground mt-2">
+            As movimentações aparecerão aqui quando forem criadas
+          </p>
+        </div>
+        } @else {
+        <div class="space-y-4">
+          @for (movement of getFilteredMovements(); track movement.id) {
+          <div
+            class="group backdrop-blur-sm bg-white/60 rounded-2xl p-6 border border-white/30 hover:bg-white/80 hover:shadow-soft transition-all duration-300"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <!-- Icon -->
+                <div
+                  class="w-12 h-12 rounded-xl bg-muted/30 flex items-center justify-center text-xl"
+                >
+                  {{ getMovementIcon(movement.type) }}
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2">
+                    <h3 class="font-semibold text-foreground">
+                      {{ getMovementTypeLabel(movement.type) }}
+                    </h3>
+                    @if (movement.bank_account && !accountId) {
+                    <span class="text-xs px-2 py-1 rounded-full bg-muted/50 text-muted-foreground">
+                      {{ movement.bank_account.name }}
+                    </span>
+                    }
+                  </div>
+                  @if (movement.description) {
+                  <p class="text-sm text-muted-foreground mt-1">{{ movement.description }}</p>
+                  }
+                  <div class="flex items-center space-x-4 mt-2">
+                    <span class="text-xs text-muted-foreground">{{
+                      formatDate(movement.movement_date)
+                    }}</span>
+                    <span class="text-xs text-muted-foreground">{{
+                      formatDateTime(movement.created_at)
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Amount and Actions -->
+              <div class="flex items-center space-x-4">
+                <div class="text-right">
+                  <div class="flex items-center space-x-1">
+                    <span class="text-sm font-medium" [class]="getMovementColor(movement.type)">
+                      {{ getAmountSign(movement.type) }}{{ formatCurrency(movement.amount) }}
+                    </span>
+                  </div>
+                </div>
+
+                @if (movement.type === 'deposit' || movement.type === 'withdrawal') {
+                <button
+                  (click)="deleteMovement(movement.id)"
+                  class="w-8 h-8 rounded-full bg-destructive-100 hover:bg-destructive-200 text-destructive-600 hover:text-destructive-700 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+                }
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        } }
+
+        <!-- Transferências Tab -->
+        @if (selectedTab === 'transfers') { @if (getFilteredTransfers().length === 0) {
+        <div class="text-center py-12">
+          <div
+            class="w-24 h-24 mx-auto mb-4 bg-muted/50 rounded-full flex items-center justify-center"
+          >
+            <span class="text-4xl">🔄</span>
+          </div>
+          <p class="text-lg font-medium text-muted-foreground">Nenhuma transferência encontrada</p>
+          <p class="text-sm text-muted-foreground mt-2">
+            As transferências aparecerão aqui quando forem criadas
+          </p>
+        </div>
+        } @else {
+        <div class="space-y-4">
+          @for (transfer of getFilteredTransfers(); track transfer.id) {
+          <div
+            class="group backdrop-blur-sm bg-white/60 rounded-2xl p-6 border border-white/30 hover:bg-white/80 hover:shadow-soft transition-all duration-300"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <!-- Icon -->
+                <div
+                  class="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-xl"
+                >
+                  🔄
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1">
+                  <h3 class="font-semibold text-foreground">Transferência</h3>
+                  <div class="flex items-center space-x-2 mt-1">
+                    @if (transfer.from_account) {
+                    <div class="flex items-center space-x-1">
+                      <div
+                        class="w-3 h-3 rounded-full"
+                        [style.background-color]="transfer.from_account.color"
+                      ></div>
+                      <span class="text-sm text-muted-foreground">{{
+                        transfer.from_account.name
+                      }}</span>
+                    </div>
+                    }
+                    <svg
+                      class="w-4 h-4 text-muted-foreground"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      />
+                    </svg>
+                    @if (transfer.to_account) {
+                    <div class="flex items-center space-x-1">
+                      <div
+                        class="w-3 h-3 rounded-full"
+                        [style.background-color]="transfer.to_account.color"
+                      ></div>
+                      <span class="text-sm text-muted-foreground">{{
+                        transfer.to_account.name
+                      }}</span>
+                    </div>
+                    }
+                  </div>
+                  @if (transfer.description) {
+                  <p class="text-sm text-muted-foreground mt-1">{{ transfer.description }}</p>
+                  }
+                  <div class="flex items-center space-x-4 mt-2">
+                    <span class="text-xs text-muted-foreground">{{
+                      formatDate(transfer.transfer_date)
+                    }}</span>
+                    <span class="text-xs text-muted-foreground">{{
+                      formatDateTime(transfer.created_at)
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Amount and Actions -->
+              <div class="flex items-center space-x-4">
+                <div class="text-right">
+                  <div class="text-lg font-bold text-primary-600">
+                    {{ formatCurrency(transfer.amount) }}
+                  </div>
+                </div>
+
+                <button
+                  (click)="deleteTransfer(transfer.id)"
+                  class="w-8 h-8 rounded-full bg-destructive-100 hover:bg-destructive-200 text-destructive-600 hover:text-destructive-700 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        } }
+      </div>
+      }
+    </div>
+  </div>
+</div>

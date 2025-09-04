@@ -137,6 +137,15 @@
           </div>
         </div>
 
+        <!-- Charts Section -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center space-x-2">
+            <span class="text-2xl">📊</span>
+            <span>Análise Financeira</span>
+          </h2>
+          <app-dashboard-charts></app-dashboard-charts>
+        </div>
+
         <!-- Recent Activity -->
         <div class="bg-white rounded-2xl shadow-lg p-6">
           <h2 class="text-xl font-semibold text-gray-800 mb-4">Atividade Recente</h2>
@@ -186,6 +195,10 @@
 
   <!-- Payment Manager Modal -->
   @if (showPaymentManager) {
-  <app-payment-manager [userId]="currentUser?.id || ''" (close)="onPaymentManagerClosed()" />
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <app-payment-manager [userId]="currentUser?.id || ''" (close)="onPaymentManagerClosed()" />
+    </div>
+  </div>
   }
 </div>

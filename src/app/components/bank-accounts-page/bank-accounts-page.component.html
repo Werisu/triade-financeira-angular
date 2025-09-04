@@ -30,7 +30,7 @@
             Gerencie suas contas bancárias e saldos
           </p>
         </div>
-        <div class="flex space-x-3">
+        <div class="flex flex-wrap gap-3">
           <button
             (click)="showManager = true"
             class="group relative inline-flex items-center space-x-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
@@ -44,6 +44,35 @@
               />
             </svg>
             <span>Gerenciar</span>
+          </button>
+          <button
+            (click)="showTransferForm = true"
+            [disabled]="bankAccounts.length < 2"
+            class="group relative inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+              />
+            </svg>
+            <span>Transferir</span>
+          </button>
+          <button
+            (click)="showAllHistory()"
+            class="group relative inline-flex items-center space-x-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+              />
+            </svg>
+            <span>Histórico</span>
           </button>
           <button
             (click)="showForm = true"
@@ -241,12 +270,65 @@
                   {{ formatCurrency(account.current_balance) }}
                 </span>
               </div>
+
+              @if (getLinkedCreditCards(account.id).length > 0) {
+              <div class="mt-3">
+                <span class="text-muted-foreground text-sm">Cartões vinculados:</span>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  @for (card of getLinkedCreditCards(account.id); track card.id) {
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white"
+                    [style.background-color]="card.color"
+                  >
+                    {{ card.name }}
+                  </span>
+                  }
+                </div>
+              </div>
+              }
             </div>
 
             <div class="mt-4 pt-4 border-t border-white/30">
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center mb-3">
                 <span class="text-sm text-muted-foreground">Criada em:</span>
                 <span class="text-sm font-medium">{{ formatDate(account.created_at) }}</span>
+              </div>
+
+              <!-- Ações da Conta -->
+              <div class="flex space-x-2">
+                <button
+                  (click)="showAccountHistory(account.id)"
+                  class="flex-1 px-3 py-2 rounded-xl bg-primary-100 hover:bg-primary-200 text-primary-700 hover:text-primary-800 transition-all duration-300 text-sm font-medium"
+                >
+                  <div class="flex items-center justify-center space-x-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                      />
+                    </svg>
+                    <span>Histórico</span>
+                  </div>
+                </button>
+                <button
+                  (click)="showTransferForm = true"
+                  [disabled]="bankAccounts.length < 2"
+                  class="flex-1 px-3 py-2 rounded-xl bg-success-100 hover:bg-success-200 text-success-700 hover:text-success-800 transition-all duration-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div class="flex items-center justify-center space-x-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                      />
+                    </svg>
+                    <span>Transferir</span>
+                  </div>
+                </button>
               </div>
             </div>
           </div>
@@ -322,5 +404,21 @@
       </div>
     </div>
   </div>
+  }
+
+  <!-- Bank Transfer Form Modal -->
+  @if (showTransferForm) {
+  <app-bank-transfer-form
+    (transferCreated)="onTransferCreated()"
+    (close)="onTransferFormClosed()"
+  ></app-bank-transfer-form>
+  }
+
+  <!-- Bank Movements History Modal -->
+  @if (showHistory) {
+  <app-bank-movements-history
+    [accountId]="selectedAccountId"
+    (close)="onHistoryClosed()"
+  ></app-bank-movements-history>
   }
 </div>
