@@ -28,6 +28,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
     total_installments: undefined,
     date: new Date().toISOString().split('T')[0],
     payment_status: 'pending',
+    allocation: null,
   };
 
   creditCards: CreditCard[] = [];
@@ -71,6 +72,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
         payment_status: this.editingExpense.payment_status,
         user_id: this.editingExpense.user_id,
         created_at: this.editingExpense.created_at,
+        allocation: this.editingExpense.allocation || null,
       };
     } else if (this.selectedCreditCardId) {
       // Modo criação - apenas definir o cartão selecionado
@@ -147,6 +149,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
       total_installments: undefined,
       date: new Date().toISOString().split('T')[0],
       payment_status: 'pending',
+      allocation: null,
     };
     if (this.selectedCreditCardId) {
       this.expense.credit_card_id = this.selectedCreditCardId;

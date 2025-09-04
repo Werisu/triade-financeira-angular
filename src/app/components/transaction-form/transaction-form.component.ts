@@ -36,6 +36,7 @@ export class TransactionFormComponent {
     date: new Date().toISOString().split('T')[0],
     payment_status: 'pending' as 'pending' | 'paid',
     bank_account_id: null as string | null,
+    allocation: null as 'needs' | 'wants' | 'savings' | null,
   };
 
   categories = [
@@ -64,6 +65,7 @@ export class TransactionFormComponent {
         date: this.transaction.date,
         payment_status: this.transaction.payment_status || 'pending',
         bank_account_id: this.transaction.bank_account_id || null,
+        allocation: this.transaction.allocation || null,
       };
     }
   }
@@ -120,6 +122,7 @@ export class TransactionFormComponent {
         date: this.transactionData.date,
         payment_status: this.transactionData.payment_status,
         bank_account_id: this.transactionData.bank_account_id,
+        allocation: this.transactionData.allocation,
       };
 
       if (this.transaction) {
@@ -132,6 +135,7 @@ export class TransactionFormComponent {
           date: this.transactionData.date,
           payment_status: this.transactionData.payment_status,
           bank_account_id: this.transactionData.bank_account_id,
+          allocation: this.transactionData.allocation,
         });
 
         if (result.success) {

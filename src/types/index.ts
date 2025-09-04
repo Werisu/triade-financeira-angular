@@ -14,6 +14,7 @@ export interface Transaction {
   date: string;
   payment_status: 'pending' | 'paid';
   bank_account_id: string | null; // Para receitas vinculadas a contas bancárias
+  allocation: 'needs' | 'wants' | 'savings' | null; // Regra 50/30/20
   created_at: string;
   bank_account?: {
     name: string;
@@ -62,6 +63,7 @@ export interface CreditCardExpense {
   total_installments?: number;
   date: string;
   payment_status: 'pending' | 'paid';
+  allocation: 'needs' | 'wants' | 'savings' | null; // Regra 50/30/20
   created_at: string;
   credit_cards?: {
     name: string;

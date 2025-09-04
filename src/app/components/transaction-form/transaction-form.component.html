@@ -102,6 +102,64 @@
           </div>
         </div>
 
+        <!-- Alocação 50/30/20 (apenas para despesas) -->
+        <div *ngIf="transactionData.type === 'expense'" class="space-y-3">
+          <label class="block text-sm font-semibold text-foreground">Alocação 50/30/20</label>
+          <div class="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              (click)="transactionData.allocation = 'needs'"
+              [class]="
+                transactionData.allocation === 'needs'
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-glow scale-105'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+              "
+              class="py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="text-center">
+                <div class="text-lg mb-1">🏠</div>
+                <div class="text-xs font-bold">50%</div>
+                <div class="text-xs">Necessidades</div>
+              </div>
+            </button>
+            <button
+              type="button"
+              (click)="transactionData.allocation = 'wants'"
+              [class]="
+                transactionData.allocation === 'wants'
+                  ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-glow scale-105'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+              "
+              class="py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="text-center">
+                <div class="text-lg mb-1">🎯</div>
+                <div class="text-xs font-bold">30%</div>
+                <div class="text-xs">Desejos</div>
+              </div>
+            </button>
+            <button
+              type="button"
+              (click)="transactionData.allocation = 'savings'"
+              [class]="
+                transactionData.allocation === 'savings'
+                  ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-glow scale-105'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+              "
+              class="py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <div class="text-center">
+                <div class="text-lg mb-1">💰</div>
+                <div class="text-xs font-bold">20%</div>
+                <div class="text-xs">Poupança</div>
+              </div>
+            </button>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            Selecione a categoria de alocação para esta despesa conforme a regra 50/30/20
+          </p>
+        </div>
+
         <!-- Categoria -->
         <div class="space-y-3">
           <label for="category" class="block text-sm font-semibold text-foreground">
