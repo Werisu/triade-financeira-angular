@@ -148,17 +148,16 @@ export class DashboardSimpleComponent implements OnInit, OnDestroy {
     // Total de despesas efetivamente pagas (transações + cartões)
     this.monthlyExpenses = transactionExpenses + creditCardExpenses;
 
-    // Calcular saldo total real:
-    // Saldo = Dinheiro disponível nas contas - Despesas não pagas (compromissos pendentes)
-    this.balance = bankAccountBalance - (unpaidTransactionExpenses + unpaidCreditCardExpenses);
+    // Calcular saldo total: apenas o saldo das contas bancárias
+    this.balance = bankAccountBalance;
 
     // Debug: Log dos valores para verificação
     console.log('=== DEBUG SALDO TOTAL ===');
     console.log('Saldo das contas:', bankAccountBalance);
+    console.log('Saldo total (apenas contas):', this.balance);
     console.log('Despesas não pagas (transações):', unpaidTransactionExpenses);
     console.log('Despesas não pagas (cartões):', unpaidCreditCardExpenses);
     console.log('Total despesas não pagas:', unpaidTransactionExpenses + unpaidCreditCardExpenses);
-    console.log('Saldo total calculado:', this.balance);
     console.log('========================');
 
     // Metas

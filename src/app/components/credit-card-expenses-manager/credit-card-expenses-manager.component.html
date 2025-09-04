@@ -343,6 +343,7 @@
   <app-credit-card-expense-form
     *ngIf="showExpenseForm"
     [selectedCreditCardId]="editingExpense?.credit_card_id"
+    [editingExpense]="editingExpense"
     (close)="onCloseExpenseForm()"
     (expenseCreated)="onExpenseSaved($event)"
   ></app-credit-card-expense-form>

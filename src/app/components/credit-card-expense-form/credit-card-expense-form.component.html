@@ -7,7 +7,9 @@
     <div class="p-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold text-foreground">Novo Gasto com Cartão</h2>
+        <h2 class="text-2xl font-bold text-foreground">
+          {{ editingExpense ? 'Editar Gasto com Cartão' : 'Novo Gasto com Cartão' }}
+        </h2>
         <button
           (click)="close.emit()"
           class="w-10 h-10 rounded-full bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center justify-center group hover:scale-110"
@@ -363,7 +365,15 @@
                 class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"
               ></div>
               }
-              <span>{{ loading ? 'Cadastrando...' : 'Cadastrar Gasto' }}</span>
+              <span>{{
+                loading
+                  ? editingExpense
+                    ? 'Salvando...'
+                    : 'Cadastrando...'
+                  : editingExpense
+                  ? 'Salvar Alterações'
+                  : 'Cadastrar Gasto'
+              }}</span>
             </div>
           </button>
         </div>
