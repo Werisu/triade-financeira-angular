@@ -115,19 +115,30 @@ export class DashboardSimpleComponent implements OnInit, OnDestroy {
     console.log('Cartões de crédito:', this.creditCardExpenses);
     console.log('Contas bancárias:', this.bankAccounts);
 
-    // Calcular receitas totais (apenas as que foram efetivamente recebidas)
+    // Obter mês e ano atual
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() retorna 0-11
+    const currentYear = currentDate.getFullYear();
+
+    // Função auxiliar para verificar se uma data está no mês atual
+    const isCurrentMonth = (dateString: string): boolean => {
+      const date = new Date(dateString);
+      return date.getMonth() + 1 === currentMonth && date.getFullYear() === currentYear;
+    };
+
+    // Calcular receitas totais do mês atual (apenas as que foram efetivamente recebidas)
     this.monthlyIncome = this.transactions
-      .filter((t) => t.type === 'income' && t.payment_status === 'paid')
+      .filter((t) => t.type === 'income' && t.payment_status === 'paid' && isCurrentMonth(t.date))
       .reduce((sum, t) => sum + t.amount, 0);
 
-    // Calcular despesas das transações normais (apenas as que foram efetivamente pagas)
+    // Calcular despesas das transações normais do mês atual (apenas as que foram efetivamente pagas)
     const transactionExpenses = this.transactions
-      .filter((t) => t.type === 'expense' && t.payment_status === 'paid')
+      .filter((t) => t.type === 'expense' && t.payment_status === 'paid' && isCurrentMonth(t.date))
       .reduce((sum, t) => sum + t.amount, 0);
 
-    // Calcular despesas dos cartões de crédito (apenas as que foram efetivamente pagas)
+    // Calcular despesas dos cartões de crédito do mês atual (apenas as que foram efetivamente pagas)
     const creditCardExpenses = this.creditCardExpenses
-      .filter((expense) => expense.payment_status === 'paid')
+      .filter((expense) => expense.payment_status === 'paid' && isCurrentMonth(expense.date))
       .reduce((sum, expense) => sum + expense.amount, 0);
 
     // Calcular saldo total das contas bancárias (dinheiro disponível)
@@ -145,19 +156,21 @@ export class DashboardSimpleComponent implements OnInit, OnDestroy {
       .filter((expense) => expense.payment_status !== 'paid')
       .reduce((sum, expense) => sum + expense.amount, 0);
 
-    // Total de despesas efetivamente pagas (transações + cartões)
+    // Total de despesas do mês atual (transações + cartões)
     this.monthlyExpenses = transactionExpenses + creditCardExpenses;
 
     // Calcular saldo total: apenas o saldo das contas bancárias
     this.balance = bankAccountBalance;
 
     // Debug: Log dos valores para verificação
-    console.log('=== DEBUG SALDO TOTAL ===');
+    console.log('=== DEBUG DASHBOARD ===');
+    console.log('Mês atual:', currentMonth, 'Ano atual:', currentYear);
+    console.log('Receitas do mês atual:', this.monthlyIncome);
+    console.log('Despesas do mês atual (transações):', transactionExpenses);
+    console.log('Despesas do mês atual (cartões):', creditCardExpenses);
+    console.log('Total despesas do mês atual:', this.monthlyExpenses);
     console.log('Saldo das contas:', bankAccountBalance);
     console.log('Saldo total (apenas contas):', this.balance);
-    console.log('Despesas não pagas (transações):', unpaidTransactionExpenses);
-    console.log('Despesas não pagas (cartões):', unpaidCreditCardExpenses);
-    console.log('Total despesas não pagas:', unpaidTransactionExpenses + unpaidCreditCardExpenses);
     console.log('========================');
 
     // Metas
