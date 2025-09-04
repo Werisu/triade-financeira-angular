@@ -1,13 +1,15 @@
 import { Routes } from '@angular/router';
 import { AuthComponent } from './components/auth/auth.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AuthGuard } from './guards/auth.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    component: DashboardComponent,
+    loadComponent: () =>
+      import('./components/dashboard-simple/dashboard-simple.component').then(
+        (m) => m.DashboardSimpleComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
@@ -16,18 +18,40 @@ export const routes: Routes = [
     canActivate: [NoAuthGuard],
   },
   {
-    path: 'credit-cards',
+    path: 'transactions',
     loadComponent: () =>
-      import('./components/credit-cards-manager/credit-cards-manager.component').then(
-        (m) => m.CreditCardsManagerComponent
+      import('./components/transactions-page/transactions-page.component').then(
+        (m) => m.TransactionsPageComponent
       ),
     canActivate: [AuthGuard],
   },
   {
-    path: 'credit-card-expenses',
+    path: 'credit-cards',
     loadComponent: () =>
-      import('./components/credit-card-expense-form/credit-card-expense-form.component').then(
-        (m) => m.CreditCardExpenseFormComponent
+      import('./components/credit-cards-page/credit-cards-page.component').then(
+        (m) => m.CreditCardsPageComponent
+      ),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'bank-accounts',
+    loadComponent: () =>
+      import('./components/bank-accounts-page/bank-accounts-page.component').then(
+        (m) => m.BankAccountsPageComponent
+      ),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'goals',
+    loadComponent: () =>
+      import('./components/goal-form/goal-form.component').then((m) => m.GoalFormComponent),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'payments',
+    loadComponent: () =>
+      import('./components/payment-manager/payment-manager.component').then(
+        (m) => m.PaymentManagerComponent
       ),
     canActivate: [AuthGuard],
   },

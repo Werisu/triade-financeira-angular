@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CreditCardService } from '../../../services/credit-card.service';
 import { CreditCard } from '../../../types';
 import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.component';
@@ -12,6 +12,8 @@ import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.co
   styleUrls: ['./credit-cards-manager.component.css'],
 })
 export class CreditCardsManagerComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
+
   creditCards: CreditCard[] = [];
   loading = false;
   showForm = false;
