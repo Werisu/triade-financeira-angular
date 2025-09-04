@@ -216,6 +216,61 @@
           </div>
         </div>
 
+        <!-- Conta Bancária (apenas para receitas) -->
+        <div *ngIf="transactionData.type === 'income'" class="space-y-3">
+          <label for="bankAccountId" class="block text-sm font-semibold text-foreground">
+            Conta Bancária *
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                />
+              </svg>
+            </div>
+            <select
+              id="bankAccountId"
+              [(ngModel)]="transactionData.bank_account_id"
+              name="bankAccountId"
+              required
+              class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm appearance-none"
+            >
+              <option value="">Selecione uma conta bancária</option>
+              <option *ngFor="let account of bankAccounts" [value]="account.id">
+                {{ account.name }} - {{ account.bank_name }} (Saldo:
+                {{ formatCurrency(account.current_balance) }})
+              </option>
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            As receitas são automaticamente adicionadas ao saldo da conta selecionada
+          </p>
+        </div>
+
         <!-- Mensagens de Erro/Sucesso -->
         <div
           *ngIf="error"

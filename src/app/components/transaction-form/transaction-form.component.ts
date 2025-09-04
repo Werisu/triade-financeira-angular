@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { BankAccountService } from '../../../services/bank-account.service';
 import { TransactionService } from '../../../services/transaction.service';
-import { Transaction } from '../../../types';
+import { BankAccount, Transaction } from '../../../types';
 
 @Component({
   selector: 'app-transaction-form',
@@ -18,10 +19,12 @@ export class TransactionFormComponent {
   @Output() saved = new EventEmitter<Transaction>();
 
   private transactionService = inject(TransactionService);
+  private bankAccountService = inject(BankAccountService);
 
   loading = false;
   error = '';
   success = '';
+  bankAccounts: BankAccount[] = [];
 
   transactionData = {
     type: 'expense' as 'income' | 'expense',
@@ -30,6 +33,7 @@ export class TransactionFormComponent {
     description: '',
     date: new Date().toISOString().split('T')[0],
     payment_status: 'pending' as 'pending' | 'paid',
+    bank_account_id: null as string | null,
   };
 
   categories = [
@@ -44,7 +48,10 @@ export class TransactionFormComponent {
     'Outros',
   ];
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Carrega as contas bancárias
+    await this.loadBankAccounts();
+
     if (this.transaction) {
       // Modo edição
       this.transactionData = {
@@ -54,17 +61,33 @@ export class TransactionFormComponent {
         description: this.transaction.description || '',
         date: this.transaction.date,
         payment_status: this.transaction.payment_status || 'pending',
+        bank_account_id: this.transaction.bank_account_id || null,
       };
     }
   }
 
+  async loadBankAccounts() {
+    try {
+      this.bankAccounts = await this.bankAccountService.getBankAccountsAsync();
+    } catch (error) {
+      console.error('Erro ao carregar contas bancárias:', error);
+      this.bankAccounts = [];
+    }
+  }
+
   isFormValid(): boolean {
-    return (
+    const basicValidation =
       this.transactionData.amount > 0 &&
       this.transactionData.category.trim() !== '' &&
       this.transactionData.description.trim() !== '' &&
-      this.transactionData.date !== ''
-    );
+      this.transactionData.date !== '';
+
+    // Para receitas, é obrigatório selecionar uma conta bancária
+    if (this.transactionData.type === 'income') {
+      return basicValidation && this.transactionData.bank_account_id !== null;
+    }
+
+    return basicValidation;
   }
 
   async onSubmit() {
@@ -86,6 +109,7 @@ export class TransactionFormComponent {
         description: this.transactionData.description,
         date: this.transactionData.date,
         payment_status: this.transactionData.payment_status,
+        bank_account_id: this.transactionData.bank_account_id,
       };
 
       if (this.transaction) {
@@ -97,6 +121,7 @@ export class TransactionFormComponent {
           description: this.transactionData.description,
           date: this.transactionData.date,
           payment_status: this.transactionData.payment_status,
+          bank_account_id: this.transactionData.bank_account_id,
         });
 
         if (result.success) {
@@ -125,5 +150,12 @@ export class TransactionFormComponent {
     } finally {
       this.loading = false;
     }
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(amount);
   }
 }

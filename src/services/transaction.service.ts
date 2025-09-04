@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Transaction } from '../types';
 import { AuthService } from './auth.service';
+import { BankAccountService } from './bank-account.service';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({
@@ -14,7 +15,11 @@ export class TransactionService {
   public transactions$ = this.transactionsSubject.asObservable();
   public loading$ = this.loadingSubject.asObservable();
 
-  constructor(private supabaseService: SupabaseService, private authService: AuthService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private authService: AuthService,
+    private bankAccountService: BankAccountService
+  ) {}
 
   async loadTransactions(userId: string): Promise<void> {
     this.loadingSubject.next(true);
@@ -22,7 +27,16 @@ export class TransactionService {
       const { data, error } = await this.supabaseService
         .getClient()
         .from('transactions')
-        .select('*')
+        .select(
+          `
+          *,
+          bank_account:bank_accounts(
+            name,
+            bank_name,
+            color
+          )
+        `
+        )
         .eq('user_id', userId)
         .order('date', { ascending: false });
 
@@ -40,11 +54,31 @@ export class TransactionService {
     transaction: Omit<Transaction, 'id' | 'created_at'>
   ): Promise<{ success: boolean; error?: string }> {
     try {
+      // Se for uma receita com conta bancária vinculada, atualiza o saldo
+      if (transaction.type === 'income' && transaction.bank_account_id) {
+        const bankAccount = await this.bankAccountService.getBankAccount(
+          transaction.bank_account_id
+        );
+        if (bankAccount) {
+          const newBalance = bankAccount.current_balance + transaction.amount;
+          await this.bankAccountService.updateBalance(transaction.bank_account_id, newBalance);
+        }
+      }
+
       const { data, error } = await this.supabaseService
         .getClient()
         .from('transactions')
         .insert(transaction as any)
-        .select()
+        .select(
+          `
+          *,
+          bank_account:bank_accounts(
+            name,
+            bank_name,
+            color
+          )
+        `
+        )
         .single();
 
       if (error) throw error;
@@ -63,12 +97,42 @@ export class TransactionService {
     transaction: Partial<Omit<Transaction, 'id' | 'created_at' | 'user_id'>>
   ): Promise<{ success: boolean; error?: string }> {
     try {
+      // Busca a transação atual para comparar valores
+      const currentTransaction = this.transactionsSubject.value.find((t) => t.id === id);
+
+      // Se for uma receita com conta bancária vinculada, atualiza o saldo
+      if (transaction.type === 'income' && transaction.bank_account_id) {
+        const bankAccount = await this.bankAccountService.getBankAccount(
+          transaction.bank_account_id
+        );
+        if (bankAccount && currentTransaction) {
+          // Remove o valor antigo e adiciona o novo
+          const oldAmount = currentTransaction.type === 'income' ? currentTransaction.amount : 0;
+          const newAmount = transaction.amount || 0;
+          const balanceDifference = newAmount - oldAmount;
+
+          if (balanceDifference !== 0) {
+            const newBalance = bankAccount.current_balance + balanceDifference;
+            await this.bankAccountService.updateBalance(transaction.bank_account_id, newBalance);
+          }
+        }
+      }
+
       const { data, error } = await this.supabaseService
         .getClient()
         .from('transactions')
         .update(transaction as any)
         .eq('id', id)
-        .select()
+        .select(
+          `
+          *,
+          bank_account:bank_accounts(
+            name,
+            bank_name,
+            color
+          )
+        `
+        )
         .single();
 
       if (error) throw error;
@@ -87,6 +151,23 @@ export class TransactionService {
 
   async deleteTransaction(id: string): Promise<{ success: boolean; error?: string }> {
     try {
+      // Busca a transação atual para reverter o saldo se necessário
+      const currentTransaction = this.transactionsSubject.value.find((t) => t.id === id);
+
+      // Se for uma receita com conta bancária vinculada, reverte o saldo
+      if (currentTransaction?.type === 'income' && currentTransaction.bank_account_id) {
+        const bankAccount = await this.bankAccountService.getBankAccount(
+          currentTransaction.bank_account_id
+        );
+        if (bankAccount) {
+          const newBalance = bankAccount.current_balance - currentTransaction.amount;
+          await this.bankAccountService.updateBalance(
+            currentTransaction.bank_account_id,
+            newBalance
+          );
+        }
+      }
+
       const { error } = await this.supabaseService
         .getClient()
         .from('transactions')

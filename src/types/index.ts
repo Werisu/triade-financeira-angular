@@ -13,7 +13,13 @@ export interface Transaction {
   description: string | null;
   date: string;
   payment_status: 'pending' | 'paid';
+  bank_account_id: string | null; // Para receitas vinculadas a contas bancárias
   created_at: string;
+  bank_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
 }
 
 export interface CreditCard {

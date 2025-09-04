@@ -28,6 +28,27 @@ export class BankAccountService {
     return this.getBankAccounts();
   }
 
+  async getBankAccount(id: string): Promise<BankAccount | null> {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) throw new Error('Usuário não autenticado');
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('bank_accounts')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', currentUser.id)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null; // Registro não encontrado
+      }
+      throw error;
+    }
+    return data;
+  }
+
   async createBankAccount(
     bankAccount: Omit<BankAccount, 'id' | 'created_at'>
   ): Promise<BankAccount> {

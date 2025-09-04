@@ -66,6 +66,14 @@
               <h3 class="font-semibold text-gray-900">{{ transaction.description }}</h3>
               <p class="text-sm text-gray-500">{{ transaction.category }}</p>
               <p class="text-sm text-gray-400">{{ formatDate(transaction.date) }}</p>
+              @if (transaction.type === 'income' && transaction.bank_account) {
+              <p
+                class="text-xs px-2 py-1 rounded-full text-white inline-block mt-1 font-medium"
+                [style.background-color]="transaction.bank_account.color"
+              >
+                {{ transaction.bank_account.name }} - {{ transaction.bank_account.bank_name }}
+              </p>
+              }
             </div>
           </div>
           <div class="text-right">
