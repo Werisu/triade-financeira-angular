@@ -16,6 +16,7 @@ import { CreditCard, CreditCardExpense } from '../../../types';
 export class CreditCardExpenseFormComponent implements OnInit {
   @Input() selectedCreditCardId?: string;
   @Output() expenseCreated = new EventEmitter<CreditCardExpense>();
+  @Output() close = new EventEmitter<void>();
 
   expense: Partial<CreditCardExpense> = {
     description: '',

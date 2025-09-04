@@ -1,6 +1,22 @@
-/* Estilos específicos para o formulário de gastos com cartão de crédito */
-.expense-form {
-  animation: fadeIn 0.3s ease-in-out;
+/* Animações de Modal */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes fadeIn {
@@ -12,6 +28,18 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+.expense-form {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .tag {
@@ -40,4 +68,29 @@
   .form-grid {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* Modal backdrop */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Modal container */
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* Sombras personalizadas */
+.shadow-large {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-soft {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }

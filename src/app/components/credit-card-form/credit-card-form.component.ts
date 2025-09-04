@@ -14,6 +14,7 @@ import { CreditCard } from '../../../types';
 })
 export class CreditCardFormComponent {
   @Output() creditCardCreated = new EventEmitter<CreditCard>();
+  @Output() close = new EventEmitter<void>();
 
   creditCard: Partial<CreditCard> = {
     name: '',

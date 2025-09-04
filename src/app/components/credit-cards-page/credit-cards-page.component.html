@@ -104,11 +104,14 @@
 
   <!-- Modals -->
   @if (showCardForm) {
-  <app-credit-card-form (creditCardCreated)="onCreditCardCreated()" />
+  <app-credit-card-form (creditCardCreated)="onCreditCardCreated()" (close)="onCardFormClosed()" />
   } @if (showCardsManager) {
   <app-credit-cards-manager (close)="onCardsManagerClosed()" />
   } @if (showExpenseForm) {
-  <app-credit-card-expense-form (expenseCreated)="onCreditCardExpenseCreated()" />
+  <app-credit-card-expense-form
+    (expenseCreated)="onCreditCardExpenseCreated()"
+    (close)="onExpenseFormClosed()"
+  />
   } @if (showExpensesManager) {
   <app-credit-card-expenses-manager (close)="onExpensesManagerClosed()" />
   }

@@ -1,80 +1,130 @@
-<div class="space-y-6">
-  <!-- Cabeçalho -->
-  <div class="flex justify-between items-center">
-    <h2 class="text-2xl font-bold text-gray-800">Cartões de Crédito</h2>
-    <button
-      (click)="showForm = !showForm"
-      class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-    >
-      {{ showForm ? 'Cancelar' : 'Novo Cartão' }}
-    </button>
-  </div>
-
-  <!-- Formulário de novo cartão -->
-  <div *ngIf="showForm" class="animate-fadeIn">
-    <app-credit-card-form (creditCardCreated)="onCreditCardCreated($event)"></app-credit-card-form>
-  </div>
-
-  <!-- Lista de cartões -->
-  <div *ngIf="loading" class="text-center py-8">
-    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-    <p class="text-gray-500 mt-2">Carregando cartões...</p>
-  </div>
-
-  <div *ngIf="!loading && creditCards.length === 0" class="text-center py-8">
-    <p class="text-gray-500">Nenhum cartão cadastrado.</p>
-    <button (click)="showForm = true" class="mt-4 text-blue-600 hover:text-blue-800 underline">
-      Cadastrar primeiro cartão
-    </button>
-  </div>
-
+<div
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
+>
   <div
-    *ngIf="!loading && creditCards.length > 0"
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    class="backdrop-blur-xl bg-white/90 rounded-3xl shadow-large border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-scale-in"
   >
-    <div
-      *ngFor="let card of creditCards"
-      class="bg-white rounded-lg shadow-md p-6 border-l-4"
-      [style.border-left-color]="card.color"
-    >
-      <div class="flex justify-between items-start mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">{{ card.name }}</h3>
+    <div class="p-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-foreground">Gerenciar Cartões de Crédito</h2>
         <button
-          (click)="deleteCreditCard(card.id)"
-          class="text-red-500 hover:text-red-700 transition-colors"
-          title="Excluir cartão"
+          (click)="close.emit()"
+          class="w-10 h-10 rounded-full bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center justify-center group hover:scale-110"
         >
-          ×
+          <svg
+            class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
         </button>
       </div>
 
-      <div class="space-y-3">
-        <div class="flex justify-between">
-          <span class="text-gray-600">Limite:</span>
-          <span class="font-medium">{{ formatLimit(card.credit_limit) }}</span>
-        </div>
-
-        <div class="flex justify-between">
-          <span class="text-gray-600">Fechamento:</span>
-          <span [class]="getStatusColor(card)"> {{ getDaysUntilClosing(card) }} dias </span>
-        </div>
-
-        <div class="flex justify-between">
-          <span class="text-gray-600">Vencimento:</span>
-          <span [class]="getStatusColor(card)"> {{ getDaysUntilDue(card) }} dias </span>
-        </div>
+      <!-- Novo Cartão Button -->
+      <div class="flex justify-end mb-6">
+        <button
+          (click)="showForm = !showForm"
+          class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+        >
+          {{ showForm ? 'Cancelar' : 'Novo Cartão' }}
+        </button>
       </div>
 
-      <div class="mt-4 pt-4 border-t border-gray-200">
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-gray-500">Dia de fechamento:</span>
-          <span class="text-sm font-medium">{{ card.closing_day }}</span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-gray-500">Dia de vencimento:</span>
-          <span class="text-sm font-medium">{{ card.due_day }}</span>
-        </div>
+      <!-- Formulário de novo cartão -->
+      @if (showForm) {
+      <div class="animate-fadeIn mb-8">
+        <app-credit-card-form
+          (creditCardCreated)="onCreditCardCreated($event)"
+        ></app-credit-card-form>
       </div>
+      }
+
+      <!-- Lista de cartões -->
+      @if (loading) {
+      <div class="text-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="text-gray-500 mt-2">Carregando cartões...</p>
+      </div>
+      } @if (!loading && creditCards.length === 0) {
+      <div class="text-center py-8">
+        <div
+          class="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center"
+        >
+          <span class="text-4xl">💳</span>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum cartão cadastrado</h3>
+        <p class="text-gray-500 mb-4">Comece adicionando seu primeiro cartão de crédito</p>
+        <button
+          (click)="showForm = true"
+          class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
+        >
+          Adicionar Cartão
+        </button>
+      </div>
+      } @if (!loading && creditCards.length > 0) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (card of creditCards; track card.id) {
+        <div
+          class="bg-white rounded-lg shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow duration-300"
+          [style.border-left-color]="card.color"
+        >
+          <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">{{ card.name }}</h3>
+            <button
+              (click)="deleteCreditCard(card.id)"
+              class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 transition-all duration-300 flex items-center justify-center group hover:scale-110"
+              title="Excluir cartão"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Limite:</span>
+              <span class="font-medium">{{ formatLimit(card.credit_limit) }}</span>
+            </div>
+
+            <div class="flex justify-between">
+              <span class="text-gray-600">Fechamento:</span>
+              <span [class]="getStatusColor(card)"> {{ getDaysUntilClosing(card) }} dias </span>
+            </div>
+
+            <div class="flex justify-between">
+              <span class="text-gray-600">Vencimento:</span>
+              <span [class]="getStatusColor(card)"> {{ getDaysUntilDue(card) }} dias </span>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Dia de fechamento:</span>
+              <span class="text-sm font-medium">{{ card.closing_day }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Dia de vencimento:</span>
+              <span class="text-sm font-medium">{{ card.due_day }}</span>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      }
     </div>
   </div>
 </div>

@@ -50,7 +50,15 @@ export class CreditCardsPageComponent implements OnInit {
     this.showCardForm = false;
   }
 
+  onCardFormClosed() {
+    this.showCardForm = false;
+  }
+
   onCreditCardExpenseCreated() {
+    this.showExpenseForm = false;
+  }
+
+  onExpenseFormClosed() {
     this.showExpenseForm = false;
   }
 
