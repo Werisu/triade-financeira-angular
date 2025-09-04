@@ -260,7 +260,7 @@ export class DashboardChartsComponent implements OnInit, OnDestroy {
     // Processar transações
     const expenseTransactions = this.transactions.filter((t) => t.type === 'expense');
     console.log('🔍 Transações de despesa:', expenseTransactions.length);
-    
+
     expenseTransactions.forEach((transaction) => {
       console.log('🔍 Transação:', transaction.category, transaction.amount);
       const current = categoryTotals.get(transaction.category) || 0;
@@ -269,9 +269,15 @@ export class DashboardChartsComponent implements OnInit, OnDestroy {
 
     // Processar despesas de cartão de crédito (incluir todas, não apenas não pagas)
     console.log('🔍 Todas as despesas de cartão:', this.creditCardExpenses.length);
-    
+
     this.creditCardExpenses.forEach((expense) => {
-      console.log('🔍 Despesa cartão:', expense.category, expense.amount, 'Status:', expense.payment_status);
+      console.log(
+        '🔍 Despesa cartão:',
+        expense.category,
+        expense.amount,
+        'Status:',
+        expense.payment_status
+      );
       const current = categoryTotals.get(expense.category) || 0;
       categoryTotals.set(expense.category, current + expense.amount);
     });
