@@ -81,6 +81,54 @@ export interface CreditCardPayment {
   };
 }
 
+export interface BankTransfer {
+  id: string;
+  user_id: string;
+  from_account_id: string;
+  to_account_id: string;
+  amount: number;
+  description: string | null;
+  transfer_date: string;
+  created_at: string;
+  from_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
+  to_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
+}
+
+export interface BankMovement {
+  id: string;
+  user_id: string;
+  bank_account_id: string;
+  type: 'deposit' | 'withdrawal' | 'transfer_in' | 'transfer_out';
+  amount: number;
+  description: string | null;
+  movement_date: string;
+  transfer_id: string | null;
+  created_at: string;
+  bank_account?: {
+    name: string;
+    bank_name: string;
+    color: string;
+  };
+  transfer?: {
+    from_account: {
+      name: string;
+      bank_name: string;
+    };
+    to_account: {
+      name: string;
+      bank_name: string;
+    };
+  };
+}
+
 export interface AuthState {
   user: User | null;
   loading: boolean;

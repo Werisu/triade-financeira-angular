@@ -1,0 +1,276 @@
+<!-- Modal para Transferência Bancária -->
+<div
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
+>
+  <div
+    class="backdrop-blur-xl bg-white/90 rounded-3xl shadow-large border border-white/20 w-full max-w-2xl animate-scale-in"
+  >
+    <div class="p-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h2 class="text-2xl font-bold text-foreground">Nova Transferência</h2>
+          <p class="text-muted-foreground mt-1">Transfira dinheiro entre suas contas</p>
+        </div>
+        <button
+          (click)="close.emit()"
+          class="w-10 h-10 rounded-full bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center justify-center group hover:scale-110"
+        >
+          <svg
+            class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Conta de Origem -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-foreground">
+            <div class="flex items-center space-x-2 mb-2">
+              <svg
+                class="w-5 h-5 text-primary-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                />
+              </svg>
+              <span>Conta de Origem</span>
+            </div>
+          </label>
+          <select
+            [(ngModel)]="fromAccountId"
+            name="fromAccount"
+            required
+            class="w-full px-4 py-4 rounded-2xl border border-border bg-background/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 text-foreground placeholder-muted-foreground"
+          >
+            <option value="">Selecione a conta de origem</option>
+            @for (account of bankAccounts; track account.id) {
+            <option [value]="account.id">
+              {{ account.name }} ({{ account.bank_name }}) -
+              {{ formatCurrency(account.current_balance) }}
+            </option>
+            }
+          </select>
+          @if (fromAccountId && getFromAccount()) {
+          <div
+            class="flex items-center space-x-2 mt-2 p-3 rounded-xl bg-primary-50/50 border border-primary-200"
+          >
+            <div
+              class="w-4 h-4 rounded-full"
+              [style.background-color]="getFromAccount()?.color"
+            ></div>
+            <span class="text-sm text-primary-700">
+              Saldo disponível: {{ formatCurrency(getFromAccount()?.current_balance || 0) }}
+            </span>
+          </div>
+          }
+        </div>
+
+        <!-- Conta de Destino -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-foreground">
+            <div class="flex items-center space-x-2 mb-2">
+              <svg
+                class="w-5 h-5 text-success-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <span>Conta de Destino</span>
+            </div>
+          </label>
+          <select
+            [(ngModel)]="toAccountId"
+            name="toAccount"
+            required
+            [disabled]="!fromAccountId"
+            class="w-full px-4 py-4 rounded-2xl border border-border bg-background/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-success-500 focus:border-transparent transition-all duration-300 text-foreground placeholder-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <option value="">Selecione a conta de destino</option>
+            @for (account of getAvailableToAccounts(); track account.id) {
+            <option [value]="account.id">{{ account.name }} ({{ account.bank_name }})</option>
+            }
+          </select>
+        </div>
+
+        <!-- Valor -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-foreground">
+            <div class="flex items-center space-x-2 mb-2">
+              <svg
+                class="w-5 h-5 text-warning-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                />
+              </svg>
+              <span>Valor da Transferência</span>
+            </div>
+          </label>
+          <div class="relative">
+            <span
+              class="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium"
+              >R$</span
+            >
+            <input
+              type="number"
+              [(ngModel)]="amount"
+              name="amount"
+              required
+              min="0.01"
+              step="0.01"
+              [max]="getFromAccount()?.current_balance || 999999"
+              placeholder="0,00"
+              class="w-full pl-12 pr-4 py-4 rounded-2xl border border-border bg-background/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-transparent transition-all duration-300 text-foreground placeholder-muted-foreground"
+            />
+          </div>
+          @if (amount > 0 && getFromAccount() && amount > getFromAccount()!.current_balance) {
+          <div
+            class="flex items-center space-x-2 p-3 rounded-xl bg-destructive-50/50 border border-destructive-200"
+          >
+            <svg
+              class="w-4 h-4 text-destructive-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+            <span class="text-sm text-destructive-700">Saldo insuficiente na conta de origem</span>
+          </div>
+          }
+        </div>
+
+        <!-- Descrição -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-foreground">
+            <div class="flex items-center space-x-2 mb-2">
+              <svg
+                class="w-5 h-5 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <span>Descrição (opcional)</span>
+            </div>
+          </label>
+          <textarea
+            [(ngModel)]="description"
+            name="description"
+            rows="3"
+            placeholder="Descrição da transferência..."
+            class="w-full px-4 py-4 rounded-2xl border border-border bg-background/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 text-foreground placeholder-muted-foreground resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Data -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-foreground">
+            <div class="flex items-center space-x-2 mb-2">
+              <svg
+                class="w-5 h-5 text-secondary-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span>Data da Transferência</span>
+            </div>
+          </label>
+          <input
+            type="date"
+            [(ngModel)]="transferDate"
+            name="transferDate"
+            required
+            class="w-full px-4 py-4 rounded-2xl border border-border bg-background/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all duration-300 text-foreground"
+          />
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex space-x-4 pt-4">
+          <button
+            type="button"
+            (click)="close.emit()"
+            class="flex-1 px-6 py-4 rounded-2xl border border-border bg-background/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all duration-300 font-semibold"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="!canTransfer() || loading"
+            class="flex-1 px-6 py-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            @if (loading) {
+            <div class="flex items-center justify-center space-x-2">
+              <div
+                class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
+              ></div>
+              <span>Transferindo...</span>
+            </div>
+            } @else {
+            <div class="flex items-center justify-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                />
+              </svg>
+              <span>Transferir</span>
+            </div>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

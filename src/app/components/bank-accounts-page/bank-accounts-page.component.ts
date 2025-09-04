@@ -1,13 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { BankAccountService } from '../../../services/bank-account.service';
+import { BankTransferService } from '../../../services/bank-transfer.service';
 import { BankAccount } from '../../../types';
 import { BankAccountFormComponent } from '../bank-account-form/bank-account-form.component';
 import { BankAccountsManagerComponent } from '../bank-accounts-manager/bank-accounts-manager.component';
+import { BankMovementsHistoryComponent } from '../bank-movements-history/bank-movements-history.component';
+import { BankTransferFormComponent } from '../bank-transfer-form/bank-transfer-form.component';
 
 @Component({
   selector: 'app-bank-accounts-page',
   standalone: true,
-  imports: [BankAccountFormComponent, BankAccountsManagerComponent],
+  imports: [
+    BankAccountFormComponent,
+    BankAccountsManagerComponent,
+    BankTransferFormComponent,
+    BankMovementsHistoryComponent,
+  ],
   templateUrl: './bank-accounts-page.component.html',
   styleUrls: ['./bank-accounts-page.component.css'],
 })
@@ -16,8 +24,14 @@ export class BankAccountsPageComponent implements OnInit {
   loading = false;
   showForm = false;
   showManager = false;
+  showTransferForm = false;
+  showHistory = false;
+  selectedAccountId?: string;
 
-  constructor(private bankAccountService: BankAccountService) {}
+  constructor(
+    private bankAccountService: BankAccountService,
+    private bankTransferService: BankTransferService
+  ) {}
 
   ngOnInit() {
     this.loadBankAccounts();
@@ -42,6 +56,30 @@ export class BankAccountsPageComponent implements OnInit {
   onBankAccountsManagerClosed() {
     this.showManager = false;
     this.loadBankAccounts();
+  }
+
+  onTransferCreated() {
+    this.showTransferForm = false;
+    this.loadBankAccounts();
+  }
+
+  onTransferFormClosed() {
+    this.showTransferForm = false;
+  }
+
+  onHistoryClosed() {
+    this.showHistory = false;
+    this.selectedAccountId = undefined;
+  }
+
+  showAccountHistory(accountId: string) {
+    this.selectedAccountId = accountId;
+    this.showHistory = true;
+  }
+
+  showAllHistory() {
+    this.selectedAccountId = undefined;
+    this.showHistory = true;
   }
 
   formatCurrency(amount: number): string {

@@ -24,6 +24,10 @@ export class BankAccountService {
     return data || [];
   }
 
+  async getBankAccountsAsync(): Promise<BankAccount[]> {
+    return this.getBankAccounts();
+  }
+
   async createBankAccount(
     bankAccount: Omit<BankAccount, 'id' | 'created_at'>
   ): Promise<BankAccount> {
