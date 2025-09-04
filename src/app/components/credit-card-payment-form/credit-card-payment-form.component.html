@@ -1,0 +1,267 @@
+<div
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
+>
+  <div
+    class="backdrop-blur-xl bg-white/90 rounded-3xl shadow-large border border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in"
+  >
+    <div class="p-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h2 class="text-2xl font-bold text-foreground">Pagar Fatura</h2>
+          <p class="text-muted-foreground mt-1">{{ creditCard.name }}</p>
+        </div>
+        <button
+          (click)="close.emit()"
+          class="w-10 h-10 rounded-full bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center justify-center group hover:scale-110"
+        >
+          <svg
+            class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Resumo da Fatura -->
+      <div class="bg-gradient-to-r from-primary-100 to-secondary-100 rounded-2xl p-6 mb-6">
+        <h3 class="text-lg font-semibold text-foreground mb-4">Resumo da Fatura</h3>
+
+        @if (loadingExpenses) {
+        <div class="text-center py-4">
+          <div
+            class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"
+          ></div>
+          <p class="text-muted-foreground mt-2">Carregando gastos...</p>
+        </div>
+        } @else {
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">Total de gastos pendentes:</span>
+            <span class="font-semibold">{{ pendingExpenses.length }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">Valor total:</span>
+            <span class="font-bold text-xl text-primary-600">{{
+              formatCurrency(paymentAmount)
+            }}</span>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Formulário de Pagamento -->
+      <form (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Conta Bancária -->
+        <div class="space-y-3">
+          <label for="bank_account_id" class="block text-sm font-semibold text-foreground">
+            Conta para Pagamento *
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                />
+              </svg>
+            </div>
+            <select
+              id="bank_account_id"
+              name="bank_account_id"
+              [(ngModel)]="selectedBankAccountId"
+              required
+              class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm appearance-none"
+            >
+              <option value="">Selecione uma conta bancária</option>
+              @for (account of bankAccounts; track account.id) {
+              <option [value]="account.id">
+                {{ account.name }} - {{ account.bank_name }} (Saldo:
+                {{ formatCurrency(account.current_balance) }})
+              </option>
+              }
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+
+          @if (getSelectedBankAccount()) {
+          <div class="bg-success-50 border border-success-200 rounded-xl p-4">
+            <div class="flex items-center space-x-2">
+              <svg
+                class="w-5 h-5 text-success-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+              <span class="text-success-700 font-medium">Saldo suficiente</span>
+            </div>
+            <p class="text-success-600 text-sm mt-1">
+              Saldo atual: {{ formatCurrency(getSelectedBankAccount()!.current_balance) }}
+            </p>
+          </div>
+          }
+        </div>
+
+        <!-- Valor do Pagamento -->
+        <div class="space-y-3">
+          <label for="payment_amount" class="block text-sm font-semibold text-foreground">
+            Valor do Pagamento (R$)
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                />
+              </svg>
+            </div>
+            <input
+              type="number"
+              id="payment_amount"
+              name="payment_amount"
+              [(ngModel)]="paymentAmount"
+              required
+              min="0"
+              step="0.01"
+              class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm"
+              placeholder="0,00"
+            />
+          </div>
+        </div>
+
+        <!-- Data do Pagamento -->
+        <div class="space-y-3">
+          <label for="payment_date" class="block text-sm font-semibold text-foreground">
+            Data do Pagamento
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <input
+              type="date"
+              id="payment_date"
+              name="payment_date"
+              [(ngModel)]="paymentDate"
+              required
+              class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm"
+            />
+          </div>
+        </div>
+
+        <!-- Descrição -->
+        <div class="space-y-3">
+          <label for="description" class="block text-sm font-semibold text-foreground">
+            Descrição (opcional)
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="description"
+              name="description"
+              [(ngModel)]="description"
+              class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Ex: Pagamento da fatura de janeiro"
+            />
+          </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="flex space-x-4 pt-6">
+          <button
+            type="button"
+            (click)="close.emit()"
+            class="flex-1 bg-muted/50 text-muted-foreground py-4 px-6 rounded-2xl font-semibold hover:bg-muted/80 hover:text-foreground transition-all duration-300 transform hover:scale-105 active:scale-95"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="loading || !canPay()"
+            class="flex-1 bg-gradient-to-r from-success-500 to-success-600 text-white py-4 px-6 rounded-2xl font-semibold shadow-soft hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95"
+          >
+            <div class="flex items-center justify-center space-x-2">
+              @if (loading) {
+              <div
+                class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"
+              ></div>
+              }
+              <span>{{ loading ? 'Processando...' : 'Pagar Fatura' }}</span>
+            </div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
