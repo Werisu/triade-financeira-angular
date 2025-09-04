@@ -254,35 +254,20 @@ export class DashboardChartsComponent implements OnInit, OnDestroy {
   private updatePieChart() {
     const categoryTotals = new Map<string, number>();
 
-    console.log('🔍 Debug Pie Chart - Transações:', this.transactions.length);
-    console.log('🔍 Debug Pie Chart - Despesas de cartão:', this.creditCardExpenses.length);
-
     // Processar transações
     const expenseTransactions = this.transactions.filter((t) => t.type === 'expense');
-    console.log('🔍 Transações de despesa:', expenseTransactions.length);
 
     expenseTransactions.forEach((transaction) => {
-      console.log('🔍 Transação:', transaction.category, transaction.amount);
       const current = categoryTotals.get(transaction.category) || 0;
       categoryTotals.set(transaction.category, current + transaction.amount);
     });
 
     // Processar despesas de cartão de crédito (incluir todas, não apenas não pagas)
-    console.log('🔍 Todas as despesas de cartão:', this.creditCardExpenses.length);
 
     this.creditCardExpenses.forEach((expense) => {
-      console.log(
-        '🔍 Despesa cartão:',
-        expense.category,
-        expense.amount,
-        'Status:',
-        expense.payment_status
-      );
       const current = categoryTotals.get(expense.category) || 0;
       categoryTotals.set(expense.category, current + expense.amount);
     });
-
-    console.log('🔍 Categorias finais:', Array.from(categoryTotals.entries()));
 
     // Converter para arrays
     const labels = Array.from(categoryTotals.keys());

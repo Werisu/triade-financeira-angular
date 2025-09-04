@@ -21,6 +21,15 @@ export class GoalsPageComponent implements OnInit {
   showForm = false;
   selectedGoal: Goal | null = null;
 
+  // Propriedades computadas para evitar loops infinitos
+  completedGoalsCount = 0;
+  totalInvestedValue = 0;
+  overallProgress = 0;
+  totalCurrentValue = 0;
+  totalTargetValue = 0;
+  goalsByType: { type: string; count: number; percentage: number }[] = [];
+  progressDistribution: { range: string; count: number; color: string }[] = [];
+
   ngOnInit() {
     this.loadGoals();
   }
@@ -36,6 +45,7 @@ export class GoalsPageComponent implements OnInit {
 
       await this.goalService.loadGoals(currentUser.id);
       this.goals = this.goalService.getGoals();
+      this.updateComputedProperties();
     } catch (error) {
       console.error('Erro ao carregar metas:', error);
       this.goals = [];
@@ -117,6 +127,16 @@ export class GoalsPageComponent implements OnInit {
       default:
         return 'Personalizada';
     }
+  }
+
+  private updateComputedProperties() {
+    this.completedGoalsCount = this.getCompletedGoalsCount();
+    this.totalInvestedValue = this.getTotalInvestedValue();
+    this.overallProgress = this.getOverallProgress();
+    this.totalCurrentValue = this.getTotalCurrentValue();
+    this.totalTargetValue = this.getTotalTargetValue();
+    this.goalsByType = this.getGoalsByType();
+    this.progressDistribution = this.getProgressDistribution();
   }
 
   formatCurrency(amount: number): string {

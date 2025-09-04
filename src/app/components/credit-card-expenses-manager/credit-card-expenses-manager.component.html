@@ -8,6 +8,29 @@
           <p class="text-purple-100 mt-1">
             Visualize, edite e organize suas despesas com cartão de crédito
           </p>
+          <p class="text-purple-200 text-sm mt-1">
+            Período: {{ currentMonthLabel }} de {{ filterYear }}
+          </p>
+          <div class="flex space-x-2 mt-2">
+            <button
+              (click)="goToPreviousMonth()"
+              class="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-colors"
+            >
+              ← Mês Anterior
+            </button>
+            <button
+              (click)="goToCurrentMonth()"
+              class="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-colors"
+            >
+              Mês Atual
+            </button>
+            <button
+              (click)="goToNextMonth()"
+              class="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-colors"
+            >
+              Próximo Mês →
+            </button>
+          </div>
         </div>
         <button
           (click)="close.emit()"
@@ -29,7 +52,7 @@
     <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
       <!-- Filtros e Controles -->
       <div class="bg-gray-50 rounded-2xl p-4 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <!-- Busca -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
@@ -37,6 +60,7 @@
               type="text"
               name="searchTerm"
               [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearchChange()"
               placeholder="Descrição ou categoria..."
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
@@ -48,6 +72,7 @@
             <select
               name="filterCreditCard"
               [(ngModel)]="filterCreditCard"
+              (ngModelChange)="onFilterChange()"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="">Todos os cartões</option>
@@ -63,11 +88,42 @@
             <select
               name="filterCategory"
               [(ngModel)]="filterCategory"
+              (ngModelChange)="onFilterChange()"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="">Todas as categorias</option>
               <option *ngFor="let category of categories" [value]="category">
                 {{ category }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Filtro por mês -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mês</label>
+            <select
+              name="filterMonth"
+              [(ngModel)]="filterMonth"
+              (ngModelChange)="onFilterChange()"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            >
+              <option *ngFor="let month of availableMonths" [value]="month.value">
+                {{ month.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Filtro por ano -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Ano</label>
+            <select
+              name="filterYear"
+              [(ngModel)]="filterYear"
+              (ngModelChange)="onFilterChange()"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            >
+              <option *ngFor="let year of availableYears" [value]="year.value">
+                {{ year.label }}
               </option>
             </select>
           </div>
@@ -79,6 +135,7 @@
               <select
                 name="sortBy"
                 [(ngModel)]="sortBy"
+                (ngModelChange)="onSortChange()"
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 <option value="date">Data</option>
@@ -86,7 +143,7 @@
                 <option value="description">Descrição</option>
               </select>
               <button
-                (click)="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+                (click)="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; onSortChange()"
                 class="px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
                 [title]="sortOrder === 'asc' ? 'Crescente' : 'Decrescente'"
               >
@@ -113,7 +170,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Total</label>
             <div class="px-3 py-2 bg-white border border-gray-300 rounded-lg">
               <span class="font-semibold text-lg text-purple-600">{{
-                formatCurrency(getTotalExpenses())
+                formatCurrency(totalExpenses)
               }}</span>
             </div>
           </div>

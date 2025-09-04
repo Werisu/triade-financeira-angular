@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { AuthService } from '../../../services/auth.service';
 import { CreditCardExpenseService } from '../../../services/credit-card-expense.service';
 import { CreditCardService } from '../../../services/credit-card.service';
 import { CreditCard } from '../../../types';
@@ -24,6 +25,8 @@ import { CreditCardsManagerComponent } from '../credit-cards-manager/credit-card
   styleUrls: ['./credit-cards-page.component.css'],
 })
 export class CreditCardsPageComponent implements OnInit {
+  private authService = inject(AuthService);
+
   creditCards: CreditCard[] = [];
   loading = false;
   showCardForm = false;
@@ -32,6 +35,10 @@ export class CreditCardsPageComponent implements OnInit {
   showExpensesManager = false;
   showPaymentForm = false;
   selectedCardForPayment?: CreditCard;
+
+  get userId(): string {
+    return this.authService.getCurrentUser()?.id || '';
+  }
 
   constructor(
     private creditCardService: CreditCardService,
