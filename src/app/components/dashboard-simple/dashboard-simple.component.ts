@@ -7,13 +7,14 @@ import { CreditCardExpenseService } from '../../../services/credit-card-expense.
 import { GoalService } from '../../../services/goal.service';
 import { TransactionService } from '../../../services/transaction.service';
 import { BankAccount, CreditCardExpense, Goal, Transaction, User } from '../../../types';
+import { DashboardChartsComponent } from '../dashboard-charts/dashboard-charts.component';
 import { NavigationComponent } from '../navigation/navigation.component';
 import { PaymentManagerComponent } from '../payment-manager/payment-manager.component';
 
 @Component({
   selector: 'app-dashboard-simple',
   standalone: true,
-  imports: [NavigationComponent, PaymentManagerComponent, RouterLink],
+  imports: [NavigationComponent, PaymentManagerComponent, DashboardChartsComponent, RouterLink],
   templateUrl: './dashboard-simple.component.html',
   styleUrls: ['./dashboard-simple.component.css'],
 })
