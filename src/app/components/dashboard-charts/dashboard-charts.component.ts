@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartType, registerables } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
@@ -8,6 +8,9 @@ import { CreditCardExpenseService } from '../../../services/credit-card-expense.
 import { GoalService } from '../../../services/goal.service';
 import { TransactionService } from '../../../services/transaction.service';
 import { CreditCardExpense, Goal, Transaction } from '../../../types';
+
+// Registrar todos os controladores do Chart.js
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard-charts',
@@ -251,21 +254,29 @@ export class DashboardChartsComponent implements OnInit, OnDestroy {
   private updatePieChart() {
     const categoryTotals = new Map<string, number>();
 
-    // Processar transações
-    this.transactions
-      .filter((t) => t.type === 'expense')
-      .forEach((transaction) => {
-        const current = categoryTotals.get(transaction.category) || 0;
-        categoryTotals.set(transaction.category, current + transaction.amount);
-      });
+    console.log('🔍 Debug Pie Chart - Transações:', this.transactions.length);
+    console.log('🔍 Debug Pie Chart - Despesas de cartão:', this.creditCardExpenses.length);
 
-    // Processar despesas de cartão de crédito
-    this.creditCardExpenses
-      .filter((expense) => expense.payment_status !== 'paid')
-      .forEach((expense) => {
-        const current = categoryTotals.get(expense.category) || 0;
-        categoryTotals.set(expense.category, current + expense.amount);
-      });
+    // Processar transações
+    const expenseTransactions = this.transactions.filter((t) => t.type === 'expense');
+    console.log('🔍 Transações de despesa:', expenseTransactions.length);
+    
+    expenseTransactions.forEach((transaction) => {
+      console.log('🔍 Transação:', transaction.category, transaction.amount);
+      const current = categoryTotals.get(transaction.category) || 0;
+      categoryTotals.set(transaction.category, current + transaction.amount);
+    });
+
+    // Processar despesas de cartão de crédito (incluir todas, não apenas não pagas)
+    console.log('🔍 Todas as despesas de cartão:', this.creditCardExpenses.length);
+    
+    this.creditCardExpenses.forEach((expense) => {
+      console.log('🔍 Despesa cartão:', expense.category, expense.amount, 'Status:', expense.payment_status);
+      const current = categoryTotals.get(expense.category) || 0;
+      categoryTotals.set(expense.category, current + expense.amount);
+    });
+
+    console.log('🔍 Categorias finais:', Array.from(categoryTotals.entries()));
 
     // Converter para arrays
     const labels = Array.from(categoryTotals.keys());
