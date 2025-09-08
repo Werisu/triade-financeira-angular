@@ -52,5 +52,13 @@ export class NavigationComponent {
       description: 'Gerenciar pagamentos',
       route: '/payments',
     },
+    {
+      id: 'reset-data',
+      label: 'Reset de Dados',
+      icon: '⚠️',
+      description: 'Zerar todos os dados financeiros',
+      route: '/reset-data',
+      isDangerous: true,
+    },
   ];
 }

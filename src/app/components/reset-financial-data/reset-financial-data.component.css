@@ -1,0 +1,64 @@
+/* Estilos específicos para o componente de reset financeiro */
+
+.confirmation-input {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* Animação para o botão de reset */
+.reset-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.reset-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Estilo para o texto de confirmação */
+.confirmation-text {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border: 2px solid #fca5a5;
+  color: #dc2626;
+}
+
+/* Animação de loading personalizada */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilo para cards de estatísticas */
+.stat-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Estilo para alertas */
+.alert-warning {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border-left: 4px solid #f59e0b;
+}
+
+.alert-error {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border-left: 4px solid #ef4444;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border-left: 4px solid #22c55e;
+}

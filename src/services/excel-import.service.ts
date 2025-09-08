@@ -4,7 +4,8 @@ export interface ImportedExpense {
   description: string;
   amount: number;
   category: string;
-  date: string;
+  purchase_date?: string; // Data real da compra
+  date: string; // Data de cobrança (calculada automaticamente)
   credit_card_id: string;
   tags?: string[];
   installment_number?: number;
@@ -26,6 +27,7 @@ export class ExcelImportService {
     'descricao',
     'valor',
     'categoria',
+    'data_compra',
     'data',
     'cartao',
     'tags',
@@ -48,7 +50,16 @@ export class ExcelImportService {
     ],
     valor: ['valor', 'amount', 'preco', 'preço', 'value', 'vlr', 'vl', 'rs', 'r$'],
     categoria: ['categoria', 'category', 'cat', 'tipo', 'classificacao', 'classificação'],
-    data: ['data', 'date', 'data_compra', 'dt', 'data da transacao', 'data da transação'],
+    data_compra: ['data_compra', 'data compra', 'purchase_date', 'purchase date', 'data da compra'],
+    data: [
+      'data',
+      'date',
+      'dt',
+      'data da transacao',
+      'data da transação',
+      'data_cobranca',
+      'data cobrança',
+    ],
     cartao: [
       'cartao',
       'cartão',
@@ -238,7 +249,8 @@ export class ExcelImportService {
       const description = row[columnIndexes['descricao']]?.toString().trim();
       const amountStr = row[columnIndexes['valor']]?.toString().trim();
       const category = row[columnIndexes['categoria']]?.toString().trim();
-      const dateStr = row[columnIndexes['data']]; // Pode ser string ou number (data do Excel)
+      const purchaseDateStr = row[columnIndexes['data_compra']]; // Data da compra (opcional)
+      const dateStr = row[columnIndexes['data']]; // Data de cobrança (pode ser string ou number)
       const cardName = row[columnIndexes['cartao']]?.toString().trim();
 
       if (rowNumber <= 3) {
@@ -246,6 +258,7 @@ export class ExcelImportService {
           description,
           amountStr,
           category,
+          purchaseDateStr,
           dateStr,
           cardName,
         });
@@ -283,14 +296,25 @@ export class ExcelImportService {
         return null;
       }
 
-      // Processar data
+      // Processar data da compra (opcional)
+      const purchaseDate = purchaseDateStr ? this.parseDate(purchaseDateStr) : null;
+      if (rowNumber <= 3) {
+        console.log(
+          `Linha ${rowNumber} - Data da compra processada:`,
+          purchaseDate,
+          'de:',
+          purchaseDateStr
+        );
+      }
+
+      // Processar data de cobrança
       const date = this.parseDate(dateStr);
       if (rowNumber <= 3) {
-        console.log(`Linha ${rowNumber} - Data processada:`, date, 'de:', dateStr);
+        console.log(`Linha ${rowNumber} - Data de cobrança processada:`, date, 'de:', dateStr);
       }
       if (!date) {
         if (rowNumber <= 3) {
-          console.log(`Linha ${rowNumber} - Data inválida:`, dateStr);
+          console.log(`Linha ${rowNumber} - Data de cobrança inválida:`, dateStr);
         }
         return null;
       }
@@ -339,6 +363,7 @@ export class ExcelImportService {
         description,
         amount,
         category,
+        purchase_date: purchaseDate || undefined,
         date,
         credit_card_id: creditCard.id,
         tags: tags.length > 0 ? tags : undefined,
@@ -436,7 +461,8 @@ export class ExcelImportService {
           'Descrição da Transação',
           'Valor (R$)',
           'Categoria',
-          'Data',
+          'Data da Compra',
+          'Data de Cobrança',
           'Cartão',
           'Tags',
           'Parcela Atual',
@@ -447,17 +473,29 @@ export class ExcelImportService {
           '150.50',
           'Alimentação',
           '2024-01-15',
+          '2024-02-05',
           'Nubank',
           'compras,supermercado',
           '1',
           '1',
         ],
-        ['Netflix', '45.90', 'Lazer', '2024-01-10', 'Itaú', 'streaming,entretenimento', '1', '1'],
+        [
+          'Netflix',
+          '45.90',
+          'Lazer',
+          '2024-01-10',
+          '2024-02-05',
+          'Itaú',
+          'streaming,entretenimento',
+          '1',
+          '1',
+        ],
         [
           'iPhone 15',
           '5000.00',
           'Tecnologia',
-          '2024-01-05',
+          '2024-01-30',
+          '2024-02-05',
           'Nubank',
           'celular,tecnologia',
           '1',
