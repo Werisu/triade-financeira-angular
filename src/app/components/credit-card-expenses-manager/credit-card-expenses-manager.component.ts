@@ -131,7 +131,7 @@ export class CreditCardExpensesManagerComponent implements OnInit, OnDestroy {
 
     // Filtrar por mês e ano
     filtered = filtered.filter((e) => {
-      const expenseDate = new Date(e.date);
+      const expenseDate = new Date(e.date + 'T00:00:00');
       const expenseMonth = expenseDate.getMonth() + 1;
       const expenseYear = expenseDate.getFullYear();
       return expenseMonth === this.filterMonth && expenseYear === this.filterYear;
@@ -152,7 +152,8 @@ export class CreditCardExpensesManagerComponent implements OnInit, OnDestroy {
 
       switch (this.sortBy) {
         case 'date':
-          comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+          comparison =
+            new Date(a.date + 'T00:00:00').getTime() - new Date(b.date + 'T00:00:00').getTime();
           break;
         case 'amount':
           comparison = a.amount - b.amount;
@@ -333,7 +334,7 @@ export class CreditCardExpensesManagerComponent implements OnInit, OnDestroy {
 
   formatDate(date: string): string {
     console.log('formatDate', date);
-    return new Date(date).toLocaleDateString('pt-BR');
+    return new Date(date + 'T00:00:00').toLocaleDateString('pt-BR');
   }
 
   getCreditCardName(creditCardId: string): string {
