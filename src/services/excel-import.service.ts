@@ -10,6 +10,7 @@ export interface ImportedExpense {
   tags?: string[];
   installment_number?: number;
   total_installments?: number;
+  allocation?: string | null; // Alocação 50/30/20
 }
 
 export interface ImportResult {
@@ -369,7 +370,7 @@ export class ExcelImportService {
         tags: tags.length > 0 ? tags : undefined,
         installment_number: installmentNumber,
         total_installments: totalInstallments,
-        payment_status: 'pending',
+        allocation: null, // Valor padrão para importações
       };
 
       if (rowNumber <= 3) {

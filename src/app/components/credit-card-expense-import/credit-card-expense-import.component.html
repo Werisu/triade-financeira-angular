@@ -1,5 +1,5 @@
 <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
     <!-- Header -->
     <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
       <div class="flex items-center justify-between">
@@ -195,8 +195,10 @@
           *ngIf="importResult.imported.length > 0"
           class="bg-white border border-gray-200 rounded-xl p-4"
         >
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">👀 Prévia das Despesas</h3>
-          <div class="overflow-x-auto">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">
+            👀 Prévia das Despesas ({{ importResult.imported.length }} itens)
+          </h3>
+          <div class="overflow-x-auto max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
@@ -221,39 +223,231 @@
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                     Parcelas
                   </th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    Alocação
+                  </th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <tr *ngFor="let expense of importResult.imported.slice(0, 5)">
-                  <td class="px-3 py-2 text-sm text-gray-900">{{ expense.description }}</td>
+                <tr
+                  *ngFor="let expense of importResult.imported; let i = index"
+                  [class.bg-blue-50]="isEditingExpense(i)"
+                >
+                  <!-- Descrição -->
                   <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <input
+                      type="text"
+                      [(ngModel)]="editedExpense.description"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    />
+                    } @else {
+                    {{ expense.description }}
+                    }
+                  </td>
+
+                  <!-- Valor -->
+                  <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <input
+                      type="number"
+                      [(ngModel)]="editedExpense.amount"
+                      step="0.01"
+                      min="0"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    />
+                    } @else {
                     {{ formatCurrency(expense.amount) }}
+                    }
                   </td>
-                  <td class="px-3 py-2 text-sm text-gray-900">{{ expense.category }}</td>
+
+                  <!-- Categoria -->
                   <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <select
+                      [(ngModel)]="editedExpense.category"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    >
+                      <option value="Alimentação">Alimentação</option>
+                      <option value="Transporte">Transporte</option>
+                      <option value="Saúde">Saúde</option>
+                      <option value="Educação">Educação</option>
+                      <option value="Lazer">Lazer</option>
+                      <option value="Vestuário">Vestuário</option>
+                      <option value="Casa">Casa</option>
+                      <option value="Tecnologia">Tecnologia</option>
+                      <option value="Serviços">Serviços</option>
+                      <option value="Outros">Outros</option>
+                    </select>
+                    } @else {
+                    {{ expense.category }}
+                    }
+                  </td>
+
+                  <!-- Data da Compra -->
+                  <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <input
+                      type="date"
+                      [(ngModel)]="editedExpense.purchase_date"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    />
+                    } @else {
                     {{ expense.purchase_date ? formatDate(expense.purchase_date) : '-' }}
+                    }
                   </td>
-                  <td class="px-3 py-2 text-sm text-gray-900">{{ formatDate(expense.date) }}</td>
+
+                  <!-- Data de Cobrança -->
                   <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <input
+                      type="date"
+                      [(ngModel)]="editedExpense.date"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    />
+                    } @else {
+                    {{ formatDate(expense.date) }}
+                    }
+                  </td>
+
+                  <!-- Cartão -->
+                  <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <select
+                      [(ngModel)]="editedExpense.credit_card_id"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    >
+                      @for (card of creditCards; track card.id) {
+                      <option [value]="card.id">{{ card.name }}</option>
+                      }
+                    </select>
+                    } @else {
                     {{ getCreditCardName(expense.credit_card_id) }}
+                    }
                   </td>
+
+                  <!-- Parcelas -->
                   <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <div class="flex gap-1">
+                      <input
+                        type="number"
+                        [(ngModel)]="editedExpense.installment_number"
+                        min="1"
+                        placeholder="Atual"
+                        class="w-12 px-1 py-1 border border-gray-300 rounded text-xs"
+                      />
+                      <span class="text-xs self-center">/</span>
+                      <input
+                        type="number"
+                        [(ngModel)]="editedExpense.total_installments"
+                        min="1"
+                        placeholder="Total"
+                        class="w-12 px-1 py-1 border border-gray-300 rounded text-xs"
+                      />
+                    </div>
+                    } @else {
                     <span *ngIf="expense.total_installments && expense.total_installments > 1">
                       {{ expense.installment_number || 1 }}/{{ expense.total_installments }}
                     </span>
                     <span *ngIf="!expense.total_installments || expense.total_installments === 1"
                       >À vista</span
                     >
+                    }
+                  </td>
+
+                  <!-- Alocação -->
+                  <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <div class="flex gap-1">
+                      <button
+                        type="button"
+                        (click)="editedExpense.allocation = 'needs'"
+                        [class]="
+                          editedExpense.allocation === 'needs'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 text-gray-700'
+                        "
+                        class="px-2 py-1 rounded text-xs font-semibold transition-colors"
+                        title="Necessidades (50%)"
+                      >
+                        🏠
+                      </button>
+                      <button
+                        type="button"
+                        (click)="editedExpense.allocation = 'wants'"
+                        [class]="
+                          editedExpense.allocation === 'wants'
+                            ? 'bg-purple-500 text-white'
+                            : 'bg-gray-200 text-gray-700'
+                        "
+                        class="px-2 py-1 rounded text-xs font-semibold transition-colors"
+                        title="Desejos (30%)"
+                      >
+                        🎯
+                      </button>
+                      <button
+                        type="button"
+                        (click)="editedExpense.allocation = 'savings'"
+                        [class]="
+                          editedExpense.allocation === 'savings'
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-200 text-gray-700'
+                        "
+                        class="px-2 py-1 rounded text-xs font-semibold transition-colors"
+                        title="Poupança (20%)"
+                      >
+                        💰
+                      </button>
+                    </div>
+                    } @else {
+                    <span class="inline-flex items-center gap-1">
+                      <span>{{ getAllocationIcon(expense.allocation || null) }}</span>
+                      <span class="text-xs">{{
+                        getAllocationLabel(expense.allocation || null)
+                      }}</span>
+                    </span>
+                    }
+                  </td>
+
+                  <!-- Ações -->
+                  <td class="px-3 py-2 text-sm text-gray-900">
+                    @if (isEditingExpense(i)) {
+                    <div class="flex gap-1">
+                      <button
+                        type="button"
+                        (click)="saveEditExpense()"
+                        class="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 transition-colors"
+                        title="Salvar"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        type="button"
+                        (click)="cancelEditExpense()"
+                        class="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600 transition-colors"
+                        title="Cancelar"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    } @else {
+                    <button
+                      type="button"
+                      (click)="startEditExpense(i)"
+                      class="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors"
+                      title="Editar"
+                    >
+                      ✏️
+                    </button>
+                    }
                   </td>
                 </tr>
               </tbody>
             </table>
-            <p
-              *ngIf="importResult.imported.length > 5"
-              class="text-sm text-gray-500 mt-2 text-center"
-            >
-              ... e mais {{ importResult.imported.length - 5 }} despesas
-            </p>
           </div>
         </div>
 

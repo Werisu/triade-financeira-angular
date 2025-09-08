@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CreditCardExpenseService } from '../../../services/credit-card-expense.service';
 import { CreditCardService } from '../../../services/credit-card.service';
 import { ExcelImportService, ImportResult } from '../../../services/excel-import.service';
@@ -8,7 +9,7 @@ import { CreditCard, CreditCardExpense } from '../../../types';
 @Component({
   selector: 'app-credit-card-expense-import',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './credit-card-expense-import.component.html',
   styleUrls: ['./credit-card-expense-import.component.css'],
 })
@@ -27,6 +28,8 @@ export class CreditCardExpenseImportComponent implements OnInit {
   loading = false;
   importing = false;
   error = '';
+  editingExpenseIndex: number | null = null;
+  editedExpense: any = null;
 
   ngOnInit() {
     this.loadCreditCards();
@@ -183,5 +186,54 @@ export class CreditCardExpenseImportComponent implements OnInit {
 
   onClose() {
     this.close.emit();
+  }
+
+  // Métodos para edição rápida
+  startEditExpense(index: number) {
+    this.editingExpenseIndex = index;
+    this.editedExpense = { ...this.importResult!.imported[index] };
+  }
+
+  cancelEditExpense() {
+    this.editingExpenseIndex = null;
+    this.editedExpense = null;
+  }
+
+  saveEditExpense() {
+    if (this.editingExpenseIndex !== null && this.editedExpense && this.importResult) {
+      this.importResult.imported[this.editingExpenseIndex] = { ...this.editedExpense };
+      this.editingExpenseIndex = null;
+      this.editedExpense = null;
+    }
+  }
+
+  isEditingExpense(index: number): boolean {
+    return this.editingExpenseIndex === index;
+  }
+
+  getAllocationLabel(allocation: string | null): string {
+    switch (allocation) {
+      case 'needs':
+        return 'Necessidades (50%)';
+      case 'wants':
+        return 'Desejos (30%)';
+      case 'savings':
+        return 'Poupança (20%)';
+      default:
+        return 'Não definido';
+    }
+  }
+
+  getAllocationIcon(allocation: string | null): string {
+    switch (allocation) {
+      case 'needs':
+        return '🏠';
+      case 'wants':
+        return '🎯';
+      case 'savings':
+        return '💰';
+      default:
+        return '❓';
+    }
   }
 }
