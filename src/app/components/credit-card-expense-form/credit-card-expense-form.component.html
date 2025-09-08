@@ -32,7 +32,7 @@
 
       <!-- Form -->
       <form (ngSubmit)="onSubmit()" class="space-y-6">
-        <!-- Cartão e Data -->
+        <!-- Cartão e Data da Compra -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-3">
             <label for="credit_card_id" class="block text-sm font-semibold text-foreground">
@@ -58,6 +58,7 @@
                 id="credit_card_id"
                 name="credit_card_id"
                 [(ngModel)]="expense.credit_card_id"
+                (ngModelChange)="onPurchaseDateOrCardChange()"
                 required
                 class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm appearance-none"
               >
@@ -85,7 +86,9 @@
           </div>
 
           <div class="space-y-3">
-            <label for="date" class="block text-sm font-semibold text-foreground">Data *</label>
+            <label for="purchase_date" class="block text-sm font-semibold text-foreground">
+              Data da Compra *
+            </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <svg
@@ -104,14 +107,50 @@
               </div>
               <input
                 type="date"
-                id="date"
-                name="date"
-                [(ngModel)]="expense.date"
+                id="purchase_date"
+                name="purchase_date"
+                [(ngModel)]="expense.purchase_date"
+                (ngModelChange)="onPurchaseDateOrCardChange()"
                 required
                 class="w-full pl-12 pr-4 py-4 bg-white/60 border border-white/30 rounded-2xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/80 transition-all duration-300 backdrop-blur-sm"
               />
             </div>
           </div>
+        </div>
+
+        <!-- Data de Cobrança (Calculada Automaticamente) -->
+        <div class="space-y-3">
+          <label for="date" class="block text-sm font-semibold text-foreground">
+            Data de Cobrança (Calculada Automaticamente)
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                class="h-5 w-5 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              [(ngModel)]="expense.date"
+              readonly
+              class="w-full pl-12 pr-4 py-4 bg-gray-100/60 border border-gray-300/30 rounded-2xl text-foreground cursor-not-allowed"
+            />
+          </div>
+          <p class="text-xs text-muted-foreground">
+            A data de cobrança é calculada automaticamente baseada no dia de fechamento do cartão
+          </p>
         </div>
 
         <!-- Descrição -->

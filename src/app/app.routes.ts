@@ -55,5 +55,13 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'reset-data',
+    loadComponent: () =>
+      import('./components/reset-financial-data/reset-financial-data.component').then(
+        (m) => m.ResetFinancialDataComponent
+      ),
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

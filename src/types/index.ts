@@ -61,7 +61,8 @@ export interface CreditCardExpense {
   tags: string[];
   installment_number?: number;
   total_installments?: number;
-  date: string;
+  purchase_date?: string; // Data real da compra
+  date: string; // Data de cobrança (calculada automaticamente)
   payment_status: 'pending' | 'paid';
   allocation: 'needs' | 'wants' | 'savings' | null; // Regra 50/30/20
   created_at: string;

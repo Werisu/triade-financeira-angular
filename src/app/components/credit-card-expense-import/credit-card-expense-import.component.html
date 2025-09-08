@@ -33,8 +33,8 @@
         <ul class="text-sm text-blue-800 space-y-1">
           <li>• O arquivo deve estar no formato Excel (.xlsx ou .xls)</li>
           <li>• A primeira linha deve conter os cabeçalhos das colunas</li>
-          <li>• Colunas obrigatórias: descrição, valor, categoria, data, cartão</li>
-          <li>• Colunas opcionais: tags, parcela_atual, total_parcelas</li>
+          <li>• Colunas obrigatórias: descrição, valor, categoria, data de cobrança, cartão</li>
+          <li>• Colunas opcionais: data da compra, tags, parcela_atual, total_parcelas</li>
           <li>• Use o template abaixo como referência</li>
           <li>• O sistema reconhece variações nos nomes das colunas</li>
         </ul>
@@ -210,7 +210,10 @@
                     Categoria
                   </th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                    Data
+                    Data da Compra
+                  </th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    Data de Cobrança
                   </th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                     Cartão
@@ -227,6 +230,9 @@
                     {{ formatCurrency(expense.amount) }}
                   </td>
                   <td class="px-3 py-2 text-sm text-gray-900">{{ expense.category }}</td>
+                  <td class="px-3 py-2 text-sm text-gray-900">
+                    {{ expense.purchase_date ? formatDate(expense.purchase_date) : '-' }}
+                  </td>
                   <td class="px-3 py-2 text-sm text-gray-900">{{ formatDate(expense.date) }}</td>
                   <td class="px-3 py-2 text-sm text-gray-900">
                     {{ getCreditCardName(expense.credit_card_id) }}

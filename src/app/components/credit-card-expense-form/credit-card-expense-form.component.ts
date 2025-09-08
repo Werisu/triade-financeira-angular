@@ -26,7 +26,8 @@ export class CreditCardExpenseFormComponent implements OnInit {
     tags: [],
     installment_number: undefined,
     total_installments: undefined,
-    date: new Date().toISOString().split('T')[0],
+    purchase_date: new Date().toISOString().split('T')[0], // Data da compra
+    date: new Date().toISOString().split('T')[0], // Data de cobrança (será calculada)
     payment_status: 'pending',
     allocation: null,
   };
@@ -65,6 +66,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
         amount: this.editingExpense.amount,
         category: this.editingExpense.category,
         credit_card_id: this.editingExpense.credit_card_id,
+        purchase_date: this.editingExpense.purchase_date || this.editingExpense.date,
         date: this.editingExpense.date,
         tags: this.editingExpense.tags || [],
         installment_number: this.editingExpense.installment_number,
@@ -147,6 +149,7 @@ export class CreditCardExpenseFormComponent implements OnInit {
       tags: [],
       installment_number: undefined,
       total_installments: undefined,
+      purchase_date: new Date().toISOString().split('T')[0],
       date: new Date().toISOString().split('T')[0],
       payment_status: 'pending',
       allocation: null,
@@ -158,5 +161,43 @@ export class CreditCardExpenseFormComponent implements OnInit {
 
   get isInstallment() {
     return this.expense.total_installments && this.expense.total_installments > 1;
+  }
+
+  // Método para calcular a data de cobrança baseada no dia de fechamento
+  calculateBillingDate() {
+    if (!this.expense.purchase_date || !this.expense.credit_card_id) {
+      return;
+    }
+
+    const selectedCard = this.creditCards.find((card) => card.id === this.expense.credit_card_id);
+    if (!selectedCard) {
+      return;
+    }
+
+    const purchaseDate = new Date(this.expense.purchase_date);
+    const purchaseDay = purchaseDate.getDate();
+    const closingDay = selectedCard.closing_day;
+
+    let billingDate: Date;
+
+    if (purchaseDay <= closingDay) {
+      // Compra antes do fechamento - cobrança no fechamento do mês atual
+      billingDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth(), closingDay);
+    } else {
+      // Compra depois do fechamento - cobrança no fechamento do próximo mês
+      billingDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + 1, closingDay);
+    }
+
+    // Ajusta se o dia não existe no mês (ex: 31 em fevereiro)
+    if (billingDate.getDate() !== closingDay) {
+      billingDate = new Date(billingDate.getFullYear(), billingDate.getMonth() + 1, 0);
+    }
+
+    this.expense.date = billingDate.toISOString().split('T')[0];
+  }
+
+  // Método chamado quando a data da compra ou cartão muda
+  onPurchaseDateOrCardChange() {
+    this.calculateBillingDate();
   }
 }
